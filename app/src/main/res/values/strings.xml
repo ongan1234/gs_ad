@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">GSAdsExample</string>
+
+    <string name="get_started" translatable="false">Get Started</string>
+    <string name="next" translatable="false">Next</string>
+
+
+    <!--  AD Test  -->
+    <string-array name="banner_ad_unit_id" translatable="false">
+        <item>ca-app-pub-3940256099942544/9214589741</item>
+        <item>ca-app-pub-3940256099942544/9214589741</item>
+        <item>ca-app-pub-3940256099942544/9214589741</item>
+    </string-array>
+    <string-array name="interstitial_ad_unit_id" translatable="false">
+        <item>ca-app-pub-3940256099942544/1033173712</item>
+        <item>ca-app-pub-3940256099942544/1033173712</item>
+        <item>ca-app-pub-3940256099942544/1033173712</item>
+    </string-array>
+    <string name="reward_interstitial_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/5354046379</string>
+    <string-array name="reward_ad_unit_id">
+        <item>ca-app-pub-3940256099942544/5224354917</item>
+        <item>ca-app-pub-3940256099942544/5224354917</item>
+        <item>ca-app-pub-3940256099942544/5224354917</item>
+        <item>ca-app-pub-3940256099942544/5224354917</item>
+        <item>ca-app-pub-3940256099942544/5224354917</item>
+    </string-array>
+    <string-array name="native_ad_unit_id" translatable="false">
+        <item>ca-app-pub-3940256099942544/2247696110</item>
+        <item>ca-app-pub-3940256099942544/2247696110</item>
+        <item>ca-app-pub-3940256099942544/2247696110</item>
+    </string-array>
+    <string-array name="open_ad_unit_id">
+        <item>ca-app-pub-3940256099942544/9257395921</item>
+        <item>ca-app-pub-3940256099942544/9257395921</item>
+        <item>ca-app-pub-3940256099942544/9257395921</item>
+    </string-array>
+    <string name="app_ad_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+
+</resources>
