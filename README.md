@@ -49,7 +49,7 @@ Copy các thẻ meta vào trong application
 ```
 
 ## Cách sử dụng
-Tạo 1 file AdKeyPosition với cú pháp (tên Ad_Sc màn hình) màn hình có thể tên Activity hoặc Fragment ví dụ:
+Tạo 1 file **AdKeyPosition.kt** với cú pháp (tên Ad_Sc màn hình) màn hình có thể tên Activity hoặc Fragment ví dụ:
 ```
 enum class AdKeyPosition {
     AppOpenAd_App_From_Background,
@@ -68,10 +68,11 @@ enum class AdKeyPosition {
     NativeAd_ScOnBoard_4
 }
 ```
-Tạo 1 AppOwner.kt như hình:
+Tạo 1 **AppOwner.kt** và thêm vào **AndroidManifest.xml** như hình:
 ![plot](./images/AppOwner.png)
+![plot](./images/AndroidManifest.png)
 
-Sử dụng AdmManager trong các Activity
+Sử dụng **AdmManager** trong các Activity
 ```kotlin
 private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this)}
 ```
