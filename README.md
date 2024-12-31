@@ -7,7 +7,7 @@ Vào mục setting.gradle.kts. Copy:
 maven { url 'https://jitpack.io' }
 ```
 Như hình:
-![Install](https://github.com/user-attachments/assets/24efb505-9b88-4c28-a9b1-aa80196f44d3)
+![plot](./images/Install.png)
 
 
 #### dependencies
@@ -30,7 +30,6 @@ Copy các thẻ meta vào trong application
 ```manifest
 <uses-permission android: name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android: name="android.permission.INTERNET" />
-![Install](https://github.com/user-attachments/assets/64bcb3d5-1688-4b9b-9f37-d86571058d40)
 
 <meta-data
      android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
@@ -48,27 +47,132 @@ Copy các thẻ meta vào trong application
      android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
      android:value="false" />
 ```
+Tạo 1 file AdKeyPosition với cú pháp (tên Ad_Sc màn hình) màn hình có thể tên Activity hoặc Fragment ví dụ:
+```
+enum class AdKeyPosition {
+    AppOpenAd_App_From_Background,
+
+    BannerAd_ScMain,
+    NativeAd_ScMain,
+    NativeAd_ScMain2,
+    InterstitialAd_ScMain,
+    RewardAd_ScMain,
+    InterstitialAd_ScMain2,
+    RewardAd_ScMain2,
+
+    NativeAd_ScOnBoard_1,
+    NativeAd_ScOnBoard_2,
+    NativeAd_ScOnBoard_3,
+    NativeAd_ScOnBoard_4
+}
+```
 Tạo 1 AppOwner.kt như hình:
+![plot](./images/AppOwner.png)
 
-
-## Kotlin
+## Cách sử dụng
+Sử dụng AdmManager trong các Activity
 ```kotlin
+private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this)}
+```
+
+Phải khởi tạo UMP trước khi sử dụng Ad, nên dùng ở trong màn Splash
+```kotlin
+mAdmManager.initUMP(gatherConsentFinished = {
+     //TODO
+})
+```
+
+### BannerAd
+Gọi Load Ad:
+```kotlin
+mAdmManager.loadBannerAd(0, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
+            .setListener(object : OnAdmListener {
+                override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
+                    super.onAdLoaded(typeAds, keyPosition)
+                }
+            })
+})
+```
+
+BannerAd Lifecycle
+```kotlin
+override fun onResume() {
+     super.onResume()
+     mAdmManager.resumeBannerAdView()
+}
+
+override fun onPause() {
+     super.onPause()
+     mAdmManager.pauseBannerAdView()
+}
+
+override fun onDestroy() {
+     mAdmManager.destroyAdByKeyPosition(TYPE_ADS.BannerAd, AdKeyPosition.BannerAd_ScMain.name)
+     mAdmManager.removeListener()
+     super.onDestroy()
+}
+```
+
+### NativeAd
+Gọi Load Ad:
+```kotlin
+mAdmManager.loadNativeAd(0, AdKeyPosition.NativeAd_ScMain2.name, binding.nativeAdContainerView, R.layout.layout_native_ad_origin,
+     isFullScreen = false
+)
+```
+
+NativeAd Lifecycle
+```kotlin
+override fun onDestroy() {
+     mAdmManager.destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScMain2.name)
+     mAdmManager.removeListener()
+     super.onDestroy()
+}
+```
+
+### InterstitialAd
+```kotlin
+mAdmManager.showInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name)
+     .setListener(object : OnAdmListener {
+          override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
+               super.onAdClosed(typeAds, keyPosition)
+               //TODO
+          }
+     })
+```
+
+### RewardAd
+```kotlin
+mAdmManager.showRewardAd(AdKeyPosition.RewardAd_ScMain.name)
+     .setListener(object : OnAdmListener {
+          override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
+               super.onAdClosed(typeAds, keyPosition)
+               //TODO
+          }
+     })
+```
+
+### OpenAd
+Để xuất hiện OpenAd thì sử dụng ***GlobalVariables.canShowOpenAd = true***. ví dụ:
+```kotlin
+override fun onStart() {
+     super.onStart()
+     GlobalVariables.canShowOpenAd = true
+}
 ```
 
 
-### Licence
-```license
-Copyright 2022 Mukhammad Erif Fanani
+OpenAd ở các màn **Splash, Subscription, OnBoard** ko nên hiện thì để ***GlobalVariables.canShowOpenAd = false***
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+### Lưu ý
+Về setListener có thể dùng ***mAdmManager.setListener(this)*** hoặc dùng như trên và sau khi finish Activity thì phải ***removeListener*** như sau:
+```kotlin
+override fun onDestroy() {
+     mAdmManager.removeListener()
+     super.onDestroy()
+}
 ```
+
+
+
