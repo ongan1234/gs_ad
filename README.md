@@ -47,6 +47,8 @@ Copy các thẻ meta vào trong application
      android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
      android:value="false" />
 ```
+
+## Cách sử dụng
 Tạo 1 file AdKeyPosition với cú pháp (tên Ad_Sc màn hình) màn hình có thể tên Activity hoặc Fragment ví dụ:
 ```
 enum class AdKeyPosition {
@@ -69,7 +71,6 @@ enum class AdKeyPosition {
 Tạo 1 AppOwner.kt như hình:
 ![plot](./images/AppOwner.png)
 
-## Cách sử dụng
 Sử dụng AdmManager trong các Activity
 ```kotlin
 private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this)}
