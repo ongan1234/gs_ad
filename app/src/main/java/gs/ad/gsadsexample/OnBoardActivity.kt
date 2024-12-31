@@ -7,12 +7,12 @@ import gs.ad.gsadsexample.adapter.OnboardPagerAdapter
 import gs.ad.gsadsexample.ads.AdKeyPosition
 import gs.ad.gsadsexample.databinding.ActivityOnboardBinding
 import gs.ad.utils.ads.AdmManager
-import gs.ad.utils.ads.IAdsManager
+import gs.ad.utils.ads.OnAdmListener
 import gs.ad.utils.ads.TYPE_ADS
 import gs.ad.utils.utils.GlobalVariables
 import gs.ad.utils.utils.PreferencesManager
 
-class OnBoardActivity : AppCompatActivity(), IAdsManager{
+class OnBoardActivity : AppCompatActivity(), OnAdmListener{
     private var _binding: ActivityOnboardBinding? = null
     private val binding get() = _binding!!
     private var currentPos = 0
@@ -25,7 +25,7 @@ class OnBoardActivity : AppCompatActivity(), IAdsManager{
 
         GlobalVariables.canShowOpenAd = false
 
-        mAdmManager.setListener(object: IAdsManager{
+        mAdmManager.setListener(object: OnAdmListener{
             override fun onAdClicked(typeAds: TYPE_ADS, keyPosition: String) {
                 super.onAdClicked(typeAds, keyPosition)
             }

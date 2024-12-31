@@ -47,10 +47,10 @@ class AdmMachine(
     private lateinit var mAdmInterstitialAd: AdmInterstitialAd
     private lateinit var mAdmRewardAd: AdmobRewardAd
     private lateinit var mAdmAppOpenAd: AdmOpenAd
-    private var mHandleEvent: HashMap<String, IAdsManager> = HashMap()
+    private var mHandleEvent: HashMap<String, OnAdmListener> = HashMap()
 
     private val canLoadOpenAd = AtomicBoolean(false)
-    private val eventAdsManager: IAdsManager?
+    private val eventAdsManager: OnAdmListener?
         get() {
             val key = keyEvent ?: return null
             return mHandleEvent[key]
@@ -81,7 +81,7 @@ class AdmMachine(
         currentActivity = activity
     }
 
-     fun setListener(event: IAdsManager) {
+     fun setListener(event: OnAdmListener) {
          val key = keyEvent ?: return
          mHandleEvent[key] = event
     }

@@ -17,7 +17,7 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         mAdmMachine.resetInitUMP()
     }
 
-    fun setListener(event: IAdsManager): AdmManager {
+    fun setListener(event: OnAdmListener): AdmManager {
         mAdmMachine.setListener(event)
         return this
     }

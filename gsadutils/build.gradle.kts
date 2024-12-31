@@ -1,7 +1,6 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("maven-publish")
 }
 
 android {
@@ -54,16 +53,4 @@ dependencies {
     //lifecycle + multidex
     implementation ("androidx.lifecycle:lifecycle-process:2.8.7")
     implementation ("com.github.eriffanani:ContentLoader:1.2.0")
-//    implementation ("com.facebook.shimmer:shimmer:0.5.0@aar")
-//    implementation ("androidx.multidex:multidex:2.0.1")
-}
-
-publishing{
-    publications{
-        register<MavenPublication>("release"){
-            afterEvaluate{
-                from(components["release"])
-            }
-        }
-    }
 }

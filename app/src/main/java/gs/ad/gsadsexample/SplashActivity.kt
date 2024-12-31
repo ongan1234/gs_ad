@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import gs.ad.gsadsexample.ads.AdKeyPosition
 import gs.ad.gsadsexample.databinding.ActivitySplashBinding
 import gs.ad.utils.ads.AdmManager
-import gs.ad.utils.ads.IAdsManager
+import gs.ad.utils.ads.OnAdmListener
 import gs.ad.utils.ads.TYPE_ADS
 import gs.ad.utils.utils.GlobalVariables
 import gs.ad.utils.utils.PreferencesManager
@@ -19,7 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SplashActivity : AppCompatActivity(), IAdsManager {
+class SplashActivity : AppCompatActivity(), OnAdmListener {
     private lateinit var binding: ActivitySplashBinding
     private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this)}
 

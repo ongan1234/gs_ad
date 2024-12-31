@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import gs.ad.gsadsexample.ads.AdKeyPosition
 import gs.ad.gsadsexample.databinding.ActivityMain2Binding
 import gs.ad.utils.ads.AdmManager
-import gs.ad.utils.ads.IAdsManager
+import gs.ad.utils.ads.OnAdmListener
 import gs.ad.utils.ads.TYPE_ADS
 import gs.ad.utils.utils.GlobalVariables
 
@@ -17,7 +17,7 @@ class MainActivity2 : AppCompatActivity() {
         binding = ActivityMain2Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mAdmManager.setListener(object: IAdsManager {
+        mAdmManager.setListener(object: OnAdmListener {
             override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
                 super.onAdLoaded(typeAds, keyPosition)
             }

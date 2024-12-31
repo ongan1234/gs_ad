@@ -1,6 +1,6 @@
 package gs.ad.utils.ads
 
-interface IAdsManager {
+interface OnAdmListener {
 
     fun onAdHaveReward(typeAds: TYPE_ADS, keyPosition: String){}
     fun onAdNotHaveReward(typeAds: TYPE_ADS, keyPosition: String){}

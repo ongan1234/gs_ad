@@ -2,49 +2,50 @@ package gs.ad.gsadsexample
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import gs.ad.gsadsexample.ads.AdKeyPosition
 import gs.ad.gsadsexample.databinding.ActivityMainBinding
 import gs.ad.utils.ads.AdmManager
-import gs.ad.utils.ads.IAdsManager
+import gs.ad.utils.ads.OnAdmListener
 import gs.ad.utils.ads.TYPE_ADS
 import gs.ad.utils.utils.GlobalVariables
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this)}
+    private val mAdmManager: AdmManager
+        get() {
+            return (application as AppOwner).mAdmBuilder.getActivity(this)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.button.setOnClickListener {
-            mAdmManager.showInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name).setListener(object: IAdsManager {
-                override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-                    super.onAdClosed(typeAds, keyPosition)
-                    startActivity(Intent(this@MainActivity, MainActivity2::class.java))
-                }
-            })
+            mAdmManager.showInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name)
+                .setListener(object : OnAdmListener {
+                    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
+                        super.onAdClosed(typeAds, keyPosition)
+                        startActivity(Intent(this@MainActivity, MainActivity2::class.java))
+                    }
+                })
         }
 
         binding.button1.setOnClickListener {
-            mAdmManager.showRewardAd(AdKeyPosition.RewardAd_ScMain.name).setListener(object: IAdsManager {
-                override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-                    super.onAdClosed(typeAds, keyPosition)
-                }
-            })
+            mAdmManager.showRewardAd(AdKeyPosition.RewardAd_ScMain.name)
+                .setListener(object : OnAdmListener {
+                    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
+                        super.onAdClosed(typeAds, keyPosition)
+                    }
+                })
         }
 
         binding.bannerView.postDelayed({
             mAdmManager.loadBannerAd(0, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
-                .setListener(object: IAdsManager {
+                .setListener(object : OnAdmListener {
                     override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
                         super.onAdLoaded(typeAds, keyPosition)
                     }
@@ -64,9 +65,13 @@ class MainActivity : AppCompatActivity() {
         startShimmerLoading()
         binding.nativeAdContainerView.postDelayed({
             mAdmManager
-                .loadNativeAd(0, AdKeyPosition.NativeAd_ScMain.name, binding.nativeAdContainerView, R.layout.layout_native_ad,
+                .loadNativeAd(
+                    0,
+                    AdKeyPosition.NativeAd_ScMain.name,
+                    binding.nativeAdContainerView,
+                    R.layout.layout_native_ad,
                     isFullScreen = false
-                ).setListener(object: IAdsManager{
+                ).setListener(object : OnAdmListener {
                     override fun onAdFailToLoaded(typeAds: TYPE_ADS, keyPosition: String) {
                         super.onAdFailToLoaded(typeAds, keyPosition)
                         stopShimmerLoading()
@@ -86,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     // Normally this should happen after a network request 😎
     private fun stopShimmerLoading() {
-        binding.layoutNativeAdLoaderContainer.visibility = GONE
+        binding.layoutNativeAdLoaderContainer.visibility = INVISIBLE
     }
 
     override fun onStart() {
