@@ -7,7 +7,7 @@ Vào mục setting.gradle.kts. Copy:
 maven { url 'https://jitpack.io' }
 ```
 Như hình:
-<img src="https://user-images.githubusercontent.com/images/Install.png" width="300"/>
+![Install](https://github.com/user-attachments/assets/24efb505-9b88-4c28-a9b1-aa80196f44d3)
 
 
 #### dependencies
@@ -26,10 +26,11 @@ implementation ("com.facebook.shimmer:shimmer:0.5.0@aar")
 ```
 
 ## AndroidManifest
-Copy các thẻ meta vào trong <application>
+Copy các thẻ meta vào trong application
 ```manifest
 <uses-permission android: name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android: name="android.permission.INTERNET" />
+![Install](https://github.com/user-attachments/assets/64bcb3d5-1688-4b9b-9f37-d86571058d40)
 
 <meta-data
      android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
@@ -53,6 +54,7 @@ Tạo 1 AppOwner.kt như hình:
 ## Kotlin
 ```kotlin
 ```
+
 
 ### Licence
 ```license
