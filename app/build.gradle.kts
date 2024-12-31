@@ -55,7 +55,6 @@ dependencies {
     implementation ("com.google.android.ump:user-messaging-platform:3.1.0")
 
     //lifecycle + multidex
-    implementation ("androidx.lifecycle:lifecycle-process:2.8.7")
     implementation ("androidx.multidex:multidex:2.0.1")
     implementation ("com.github.eriffanani:ContentLoader:1.2.0")
     implementation ("com.facebook.shimmer:shimmer:0.5.0@aar")
