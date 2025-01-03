@@ -4,6 +4,26 @@
     <string name="get_started" translatable="false">Get Started</string>
     <string name="next" translatable="false">Next</string>
 
+    <!--  ads & sub  -->
+    <string name="more_app" translatable="false">https://play.google.com/store/apps/developer?id=Technology+Product+and+Service</string>
+    <string-array name="group_email">
+        <item>bestfreeappsgames@gmail.com</item>
+    </string-array>
+    <string name="sub_text_des_1" translatable="false">
+    • One you confirm the purchase, your payment will be charged to your Google Account.
+    </string>
+    <string name="sub_text_des_2" translatable="false">
+    • Your subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period.
+    </string>
+    <string name="sub_text_des_3" translatable="false">
+    • Your account will be charged for renewal within 24-hours prior to the end of the current period.
+    </string>
+    <string name="sub_text_des_4" translatable="false">
+    • Subscription maybe managed by the user and auto-renewal maybe turned off by going to the user’s account setting after purchasing.
+    </string>
+    <string name="text_restore" translatable="false"><b>Restore</b></string>
+    <string name="license_key" translatable="false">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqJBaOdDmNCMMcsK/NyPAlBIz62MtUFFvAMjSpNiM7alhoAbwMW4cSzy+cjMvSYWgDQv+SnD9YqK9ZcZ0rJ/gQkBclhLtw5rQjq/KpEuoToTkg3zxJd6epUiLsieBXgGwTMpEFVoz3qDfYQXO9bqvJZVQMjeFzSpfpQYboaHb0ohcHKqxvmvlGgz1FYtqI8PmAxq0HwHvnf/yXQeyQ9hWXJo1DpshxgltzT+ShR0GczCPasffi5pUTVwAyCgMq+SvZ84bOJ0uA4wnaktM09sjxbpmoUQxKVeJ4q2Ihe6ln7XK06hQgoYR1YGzRH+hGbWmB9TN3cyeYVGV9DIIkFOVwwIDAQAB</string>
+
 
     <!--  AD Test  -->
     <string-array name="banner_ad_unit_id" translatable="false">

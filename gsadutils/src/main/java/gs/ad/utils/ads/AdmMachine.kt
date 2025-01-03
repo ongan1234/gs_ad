@@ -100,7 +100,7 @@ class AdmMachine(
     }
 
      fun showAds() {
-        getCurrentActivity()?.runOnUiThread { delEventDialogLoadAds() }
+        getCurrentActivity().runOnUiThread { delEventDialogLoadAds() }
     }
 
      fun closeAds(typeAds: TYPE_ADS, keyPosition: String) {
@@ -143,15 +143,15 @@ class AdmMachine(
         eventAdsManager?.onAdClicked(typeAds, keyPosition)
     }
 
-     fun countToShowAds(type_ads: TYPE_ADS, key_pos: String, startAds: Int, loopAds: Int) {
+     fun countToShowAds(typeAds: TYPE_ADS, keyPosition: String, startAds: Int, loopAds: Int) {
         if (PreferencesManager.getInstance().isSUB()) {
-            closeAds(type_ads, key_pos)
+            closeAds(typeAds, keyPosition)
             return
         }
 
-        var countFullAds = PreferencesManager.getInstance().getCounterAds(key_pos)
+        var countFullAds = PreferencesManager.getInstance().getCounterAds(keyPosition)
         countFullAds += 1
-        PreferencesManager.getInstance().saveCounterAds(key_pos, countFullAds)
+        PreferencesManager.getInstance().saveCounterAds(keyPosition, countFullAds)
         var isShowAds = false
         isShowAds = if (countFullAds < startAds) {
             false
@@ -162,9 +162,9 @@ class AdmMachine(
         }
 
         if (isShowAds) {
-            showPopupLoadAds(type_ads, key_pos)
+            showPopupLoadAds(typeAds, keyPosition)
         } else {
-            closeAds(type_ads, key_pos)
+            closeAds(typeAds, keyPosition)
         }
     }
 

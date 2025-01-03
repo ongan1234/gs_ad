@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import gs.ad.utils.utils.PreferencesManager
 
 class AdmBuilder(
     val context: Context,
@@ -47,6 +48,10 @@ class AdmBuilder(
     fun getActivity(activity: Activity): AdmManager{
         mAdmMachine.setActivity(activity)
         return mAdmManager
+    }
+
+    fun resetCounterAds(keyCount: String){
+        PreferencesManager.getInstance().resetCounterAds(keyCount)
     }
 
     companion object {

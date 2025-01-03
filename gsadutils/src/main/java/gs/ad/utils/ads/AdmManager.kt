@@ -1,9 +1,18 @@
 package gs.ad.utils.ads
 
 import androidx.constraintlayout.widget.ConstraintLayout
+import gs.ad.utils.utils.PreferencesManager
 
 class AdmManager(private val mAdmMachine: AdmMachine) {
     private constructor(builder: Builder) : this(builder.admMachine)
+
+    fun resetCounterAds(keyCount: String){
+        PreferencesManager.getInstance().resetCounterAds(keyCount)
+    }
+
+    fun getCounterAds(keyCount: String): Long{
+        return PreferencesManager.getInstance().getCounterAds(keyCount)
+    }
 
     fun initUMP(
         isTestUMP: Boolean = false,
@@ -38,6 +47,16 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
 
     fun preloadOpenAd(): AdmManager {
         mAdmMachine.preloadOpenAd()
+        return this
+    }
+
+    fun countToShowInterstitialAd(keyPosition: String, firstShowAd: Int, loopShowAd: Int): AdmManager {
+        mAdmMachine.countToShowAds(TYPE_ADS.InterstitialAd, keyPosition, firstShowAd, loopShowAd)
+        return this
+    }
+
+    fun countToShowRewardAd(keyPosition: String, firstShowAd: Int, loopShowAd: Int): AdmManager {
+        mAdmMachine.countToShowAds(TYPE_ADS.RewardAd, keyPosition, firstShowAd, loopShowAd)
         return this
     }
 
@@ -108,7 +127,7 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
     }
 
     companion object {
-        const val TAG = "AdmConference"
+        const val TAG = "AdmManager"
         inline fun build(admMachine: AdmMachine, block: Builder.() -> Unit) =
             Builder(admMachine).apply(block).build()
     }

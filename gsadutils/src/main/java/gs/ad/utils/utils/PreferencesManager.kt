@@ -38,6 +38,10 @@ class PreferencesManager {
         return Prefs[APP_SHOW_ONBOARD, false]
     }
 
+    fun resetCounterAds(keyCount: String) {
+        Prefs[keyCount] = 0
+    }
+
     fun getCounterAds(keyCount: String): Long {
         return Prefs[keyCount, 0]
     }

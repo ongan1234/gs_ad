@@ -24,6 +24,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.buttonCount.text = "Count to show ads"
+        binding.buttonCount.setOnClickListener {
+            binding.buttonCount.text = "Count to show ads " + (mAdmManager.getCounterAds(AdKeyPosition.InterstitialAd_ScMain.name) + 1)
+            mAdmManager.countToShowInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name,
+                firstShowAd = 0,
+                loopShowAd = 5)
+                .setListener(object : OnAdmListener {
+                    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
+                        super.onAdClosed(typeAds, keyPosition)
+                        //TODO
+                    }
+                })
+        }
+
         binding.button.setOnClickListener {
             mAdmManager.showInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name)
                 .setListener(object : OnAdmListener {
