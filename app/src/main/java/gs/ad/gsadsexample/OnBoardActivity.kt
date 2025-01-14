@@ -43,14 +43,16 @@ class OnBoardActivity : AppCompatActivity(), OnAdmListener{
 
     }
 
-    override fun onDestroy() {
+    fun removeListener(){
         mAdmManager
             .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScOnBoard_1.name)
             .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScOnBoard_2.name)
             .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScOnBoard_3.name)
             .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScOnBoard_4.name)
+            .removeListener()
+    }
 
-        mAdmManager.removeListener()
+    override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }

@@ -1,6 +1,5 @@
 package gs.ad.utils.utils
 
-
 object GlobalVariables {
     var isShowSub : Boolean = false
     var isShowPopup : Boolean = false

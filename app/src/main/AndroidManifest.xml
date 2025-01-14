@@ -43,6 +43,9 @@
             android:name=".OnBoardActivity"
             android:exported="false" />
         <activity
+            android:name=".SubscriptionActivity"
+            android:exported="false" />
+        <activity
             android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>

@@ -4,25 +4,25 @@ import android.util.Log
 import androidx.multidex.MultiDexApplication
 import gs.ad.gsadsexample.ads.AdKeyPosition
 import gs.ad.gsadsexample.sub.ConsumableProductId
-import gs.ad.gsadsexample.sub.SubProductId
+import gs.ad.gsadsexample.sub.SubscriptionProductId
 import gs.ad.utils.ads.AdmBuilder
 import gs.ad.utils.ads.AdmConfig
 import gs.ad.utils.google_iab.BillingClientLifecycle
-import gs.ad.utils.google_iab.BillingConnector
-import gs.ad.utils.google_iab.BillingEventListener
-import gs.ad.utils.google_iab.enums.ErrorType
-import gs.ad.utils.google_iab.enums.ProductType
-import gs.ad.utils.google_iab.models.BillingResponse
-import gs.ad.utils.google_iab.models.ProductInfo
-import gs.ad.utils.google_iab.models.PurchaseInfo
 import gs.ad.utils.utils.GlobalVariables
 
-class AppOwner: MultiDexApplication(), BillingEventListener{
+class AppOwner: MultiDexApplication(){
     lateinit var mAdmBuilder: AdmBuilder
     lateinit var mBillingClientLifecycle: BillingClientLifecycle
 
     override fun onCreate() {
         super.onCreate()
+
+        mBillingClientLifecycle = BillingClientLifecycle.build(applicationContext){
+            licenseKey = applicationContext.getString(R.string.license_key)
+            consumableIds = enumValues<ConsumableProductId>().map { it.id }
+            subscriptionIds = enumValues<SubscriptionProductId>().map { it.id }
+        }
+
         mAdmBuilder = AdmBuilder.build(applicationContext) {
             keyShowOpen = AdKeyPosition.AppOpenAd_App_From_Background.name
             config = AdmConfig(
@@ -32,114 +32,16 @@ class AppOwner: MultiDexApplication(), BillingEventListener{
                 listNativeAdUnitID = resources.getStringArray(R.array.native_ad_unit_id).toList(),
                 listOpenAdUnitID = resources.getStringArray(R.array.open_ad_unit_id).toList()
             )
+            billingClient = mBillingClientLifecycle
         }
 
         enumValues<AdKeyPosition>().forEach {
             GlobalVariables.AdsKeyPositionAllow[it.name] = true
         }
 
-
-        mBillingClientLifecycle = BillingClientLifecycle.build(applicationContext){
-            licenseKey = applicationContext.getString(R.string.license_key)
-            consumableIds = enumValues<ConsumableProductId>().map { it.id }
-            subscriptionIds = enumValues<SubProductId>().map { it.id }
-        }
-
-        mBillingClientLifecycle.connectBillingConnector()
-
-        mBillingClientLifecycle.fetchSubPurchasedProducts()
-        mBillingClientLifecycle.setListener(this)
-    }
-
-    override fun onProductsFetched(productDetails: MutableList<ProductInfo>) {
-        productDetails.forEach { s->
-            when(s.product){
-                SubProductId.Weekly.id -> {
-                    Log.d(TAG, "" +
-                            "name: " + s.name + "\n" +
-                            "price: " + s.subscriptionOfferDetails.first().pricingPhases.first().formattedPrice)
-                }
-                SubProductId.Yearly.id -> {
-                    Log.d(TAG, "" +
-                            "name: " + s.name + "\n" +
-                            "price: " + s.subscriptionOfferDetails.first().pricingPhases.first().formattedPrice)
-                }
-                ConsumableProductId.gems300.id -> {
-                    Log.d(TAG, "" +
-                            "name: " + s.name + "\n" +
-                            "price: " + s.oneTimePurchaseOfferFormattedPrice)
-                }
-                ConsumableProductId.gems1000.id -> {
-                    Log.d(TAG, "" +
-                            "name: " + s.name + "\n" +
-                            "price: " + s.oneTimePurchaseOfferFormattedPrice)
-                }
-                ConsumableProductId.gems3000.id -> {
-                    Log.d(TAG, "" +
-                            "name: " + s.name + "\n" +
-                            "price: " + s.oneTimePurchaseOfferFormattedPrice)
-                }
-                ConsumableProductId.gems10000.id -> {
-                    Log.d(TAG, "" +
-                            "name: " + s.name + "\n" +
-                            "price: " + s.oneTimePurchaseOfferFormattedPrice)
-                }
-            }
-
-        }
-    }
-
-    override fun onPurchasedProductsFetched(
-        productType: ProductType,
-        purchases: MutableList<PurchaseInfo>
-    ) {
-        purchases.forEach { s->
-            Log.d(TAG, "onPurchasedProductsFetched: " + s.product)
-        }
-    }
-
-    override fun onProductsPurchased(purchases: MutableList<PurchaseInfo>) {
-        purchases.forEach { s->
-            Log.d(TAG, "onProductsPurchased: " + s.product)
-        }
-    }
-
-    override fun onPurchaseAcknowledged(purchase: PurchaseInfo) {
-        Log.d(TAG, "onProductsPurchased: " + purchase.product)
-    }
-
-    override fun onPurchaseConsumed(purchase: PurchaseInfo) {
-        Log.d(TAG, "onPurchaseConsumed: " + purchase.product)
-    }
-
-    @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
-    override fun onBillingError(
-        billingConnector: BillingConnector,
-        response: BillingResponse
-    ) {
-        when (response.errorType) {
-            ErrorType.CLIENT_NOT_READY -> {}
-            ErrorType.CLIENT_DISCONNECTED -> {}
-            ErrorType.PRODUCT_NOT_EXIST -> {}
-            ErrorType.CONSUME_ERROR -> {}
-            ErrorType.CONSUME_WARNING -> {}
-            ErrorType.ACKNOWLEDGE_ERROR -> {}
-            ErrorType.ACKNOWLEDGE_WARNING -> {}
-            ErrorType.FETCH_PURCHASED_PRODUCTS_ERROR -> {}
-            ErrorType.BILLING_ERROR -> {}
-            ErrorType.USER_CANCELED -> {}
-            ErrorType.SERVICE_UNAVAILABLE -> {}
-            ErrorType.BILLING_UNAVAILABLE -> {}
-            ErrorType.ITEM_UNAVAILABLE -> {}
-            ErrorType.DEVELOPER_ERROR -> {}
-            ErrorType.ERROR -> {}
-            ErrorType.ITEM_ALREADY_OWNED -> {}
-            ErrorType.ITEM_NOT_OWNED -> {}
-        }
     }
 
     override fun onTerminate() {
-        mBillingClientLifecycle.destroyBillingConnector()
         mAdmBuilder.resetCounterAds(AdKeyPosition.InterstitialAd_ScMain.name)
         super.onTerminate()
     }

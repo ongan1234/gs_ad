@@ -42,27 +42,27 @@ class PreferencesManager {
         Prefs[keyCount] = 0
     }
 
-    fun getCounterAds(keyCount: String): Long {
+    fun getCounterAds(keyCount: String): Int {
         return Prefs[keyCount, 0]
     }
 
-    fun saveCounterAds(keyCount: String, count: Long) {
+    fun saveCounterAds(keyCount: String, count: Int) {
         Prefs[keyCount] = count
     }
 
-    fun saveCountRewardAds(id: Int, count: Long) {
+    fun saveCountRewardAds(id: Int, count: Int) {
         Prefs[APP_COUNT_REWARD_ADS + "$id"] = count
     }
 
-    fun getCountRewardAds(id: Int): Long {
+    fun getCountRewardAds(id: Int): Int {
         return Prefs[APP_COUNT_REWARD_ADS + "$id", 0]
     }
 
-    fun saveTotalRewardAds(id: Int, count: Long) {
+    fun saveTotalRewardAds(id: Int, count: Int) {
         Prefs[APP_TOTAL_REWARD_ADS + "$id"] = count
     }
 
-    fun getTotalRewardAds(id: Int): Long {
+    fun getTotalRewardAds(id: Int): Int {
         return Prefs[APP_TOTAL_REWARD_ADS + "$id", 5]
     }
 

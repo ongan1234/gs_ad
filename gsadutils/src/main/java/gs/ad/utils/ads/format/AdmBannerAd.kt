@@ -44,7 +44,7 @@ internal class AdmBannerAd(
     }
 
     private val keyPosition: String get(){
-        val model = currentModel ?: return ""
+        val model = currentModel ?: return "null"
         return model.keyPosition
     }
 
@@ -74,14 +74,21 @@ internal class AdmBannerAd(
         }
 
     fun loadBanner(id : Int, keyPosition: String, adContainerView: ConstraintLayout) {
-        destroyView(keyPosition)
+//        destroyView(keyPosition)
 
-        if (listBannerAdUnitId.isEmpty()) return
-        if (id >= listBannerAdUnitId.count()) return
-        if (!NetworkUtil.isNetworkAvailable(context)) return
-        val act = admMachine.getCurrentActivity() ?: return
-        if (PreferencesManager.getInstance().isSUB())return
+        if (listBannerAdUnitId.isEmpty() ||
+            id >= listBannerAdUnitId.count() ||
+            !NetworkUtil.isNetworkAvailable(context) ||
+            currentModelByKeyPosition(keyPosition) != null ||
+            admMachine.getCurrentActivity().isFinishing ||
+            admMachine.getCurrentActivity().isDestroyed) {
+            admMachine.onAdFailToLoaded(TYPE_ADS.BannerAd, keyPosition)
+            return
+        }
 
+        if (PreferencesManager.getInstance().isSUB()) return
+
+        val act = admMachine.getCurrentActivity()
         // Create a new ad view.
         val mAdView = AdView(act)
         mAdView.setAdSize(adSize)
@@ -134,12 +141,12 @@ internal class AdmBannerAd(
 
     override fun onAdImpression() {
         super.onAdImpression()
-        Log.d(TAG, "bannerView onAdImpression " + admMachine.getCurrentActivity()?.let { it::class.java.simpleName })
+        Log.d(TAG, "bannerView onAdImpression " + admMachine.getCurrentActivity().let { it::class.java.simpleName })
     }
 
     override fun onAdLoaded() {
         super.onAdLoaded()
-        Log.d(TAG, "bannerView onAdLoaded " + admMachine.getCurrentActivity()?.let { it::class.java.simpleName })
+        Log.d(TAG, "bannerView onAdLoaded " + admMachine.getCurrentActivity().let { it::class.java.simpleName })
         val model = currentModel ?: return
 //        model.textView?.visibility = View.GONE
         model.adContainerView?.visibility = View.VISIBLE

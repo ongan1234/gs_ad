@@ -1,115 +1,187 @@
 package gs.ad.gsadsexample
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import gs.ad.gsadsexample.ads.AdKeyPosition
 import gs.ad.gsadsexample.databinding.ActivityMainBinding
+import gs.ad.gsadsexample.sub.SubscriptionProductId
 import gs.ad.utils.ads.AdmManager
 import gs.ad.utils.ads.OnAdmListener
 import gs.ad.utils.ads.TYPE_ADS
+import gs.ad.utils.google_iab.BillingClientLifecycle
+import gs.ad.utils.google_iab.OnBillingListener
+import gs.ad.utils.google_iab.models.PurchaseInfo
 import gs.ad.utils.utils.GlobalVariables
+import gs.ad.utils.utils.PreferencesManager
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnAdmListener {
     private lateinit var binding: ActivityMainBinding
     private val mAdmManager: AdmManager
         get() {
-            return (application as AppOwner).mAdmBuilder.getActivity(this)
+            return (application as AppOwner).mAdmBuilder.isMainActivity(this)
         }
+
+    private val mBillingClientLifecycle: BillingClientLifecycle? get() { return  (application as AppOwner).mBillingClientLifecycle ?: null}
+
+    private var mLaunchSubForResult = registerForActivityResult<Intent, ActivityResult>(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        GlobalVariables.isShowSub = false
+        checkSubToUpdateUI()
+    }
+
+    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
+        super.onAdClosed(typeAds, keyPosition)
+        when(typeAds){
+            TYPE_ADS.BannerAd -> {}
+            TYPE_ADS.NativeAd -> {}
+            TYPE_ADS.OpenAd -> {}
+            TYPE_ADS.InterstitialAd -> {
+                if(keyPosition == AdKeyPosition.InterstitialAd_ScMain.name){
+                    startActivity(Intent(this@MainActivity, MainActivity2::class.java))
+                }else if (keyPosition == AdKeyPosition.InterstitialAd_ScMain_CountShowAd.name){
+                    Log.d(TAG, "Count Ads onAdClosed : " + mAdmManager.getCounterAds(AdKeyPosition.InterstitialAd_ScMain_CountShowAd.name))
+                }
+            }
+            TYPE_ADS.RewardAd -> {}
+        }
+    }
+
+    override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
+        super.onAdLoaded(typeAds, keyPosition)
+        when(typeAds){
+            TYPE_ADS.BannerAd -> {}
+            TYPE_ADS.NativeAd -> stopShimmerLoading()
+            TYPE_ADS.OpenAd -> {}
+            TYPE_ADS.InterstitialAd ->{}
+            TYPE_ADS.RewardAd -> {}
+        }
+    }
+
+    override fun onAdFailToLoaded(typeAds: TYPE_ADS, keyPosition: String) {
+        super.onAdFailToLoaded(typeAds, keyPosition)
+        when(typeAds){
+            TYPE_ADS.BannerAd -> {}
+            TYPE_ADS.NativeAd -> stopShimmerLoading()
+            TYPE_ADS.OpenAd -> {}
+            TYPE_ADS.InterstitialAd -> {}
+            TYPE_ADS.RewardAd -> {}
+        }
+    }
+
+    private fun openPlayStoreAccount(packageName : String = "", sku : String = "") {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/account/subscriptions?package=$packageName")))
+        } catch (e: ActivityNotFoundException) {
+            e.printStackTrace()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        mAdmManager.setListener(this)
+
+        binding.button2.setOnClickListener {
+            if(!PreferencesManager.getInstance().isSUB()){
+                val intent = Intent(this, SubscriptionActivity::class.java)
+                mLaunchSubForResult.launch(intent)
+            }else{
+                openPlayStoreAccount("anime.girlfriend.app", SubscriptionProductId.Weekly.id)
+                Toast.makeText(this@MainActivity, "YOU HAVE SUB", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         binding.buttonCount.text = "Count to show ads"
+        mAdmManager.resetCounterAds(AdKeyPosition.InterstitialAd_ScMain_CountShowAd.name)
         binding.buttonCount.setOnClickListener {
-            binding.buttonCount.text = "Count to show ads " + (mAdmManager.getCounterAds(AdKeyPosition.InterstitialAd_ScMain.name) + 1)
-            mAdmManager.countToShowInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name,
-                firstShowAd = 0,
-                loopShowAd = 5)
-                .setListener(object : OnAdmListener {
-                    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdClosed(typeAds, keyPosition)
-                        //TODO
-                    }
-                })
+            binding.buttonCount.text =
+                "Count to show ads " + (mAdmManager.getCounterAds(AdKeyPosition.InterstitialAd_ScMain_CountShowAd.name)+ 1)
+            mAdmManager.countToShowInterstitialAd(
+                AdKeyPosition.InterstitialAd_ScMain_CountShowAd.name,
+                firstShowAd = 3,
+                loopShowAd = 2
+            )
         }
 
         binding.button.setOnClickListener {
             mAdmManager.showInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name)
-                .setListener(object : OnAdmListener {
-                    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdClosed(typeAds, keyPosition)
-                        startActivity(Intent(this@MainActivity, MainActivity2::class.java))
-                    }
-                })
         }
 
         binding.button1.setOnClickListener {
             mAdmManager.showRewardAd(AdKeyPosition.RewardAd_ScMain.name)
-                .setListener(object : OnAdmListener {
-                    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdClosed(typeAds, keyPosition)
-                    }
-                })
         }
 
-        binding.bannerView.postDelayed({
-            mAdmManager.loadBannerAd(0, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
-                .setListener(object : OnAdmListener {
-                    override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdLoaded(typeAds, keyPosition)
-                    }
+        mBillingClientLifecycle?.setListener(this, object : OnBillingListener {
+            override fun onPurchasedProductsFetched(purchaseInfos: List<PurchaseInfo>) {
+                super.onPurchasedProductsFetched(purchaseInfos)
+                Log.d(TAG, "onPurchasedProductsFetched: ")
+                runOnUiThread {
+                    checkSubToUpdateUI()
+                }
+            }
+        })
 
-                    override fun onAdClicked(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdClicked(typeAds, keyPosition)
-                    }
+    }
 
-                    override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdClosed(typeAds, keyPosition)
-                    }
-                })
+    private fun checkSubToUpdateUI() {
+        if (PreferencesManager.getInstance().isSUB()) {
+            stopShimmerLoading()
+            binding.button2.text = "Have Sub"
+            mAdmManager.destroyAdByKeyPosition(
+                TYPE_ADS.BannerAd,
+                AdKeyPosition.BannerAd_ScMain.name
+            )
+            mAdmManager.destroyAdByKeyPosition(
+                TYPE_ADS.NativeAd,
+                AdKeyPosition.NativeAd_ScMain.name
+            )
+        } else {
+            binding.button2.text = "Buy Sub"
+            loadNativeAd()
+            loadBannerAd()
+        }
+    }
 
-        }, 1000)
-
-
+    private fun loadNativeAd() {
         startShimmerLoading()
-        binding.nativeAdContainerView.postDelayed({
-            mAdmManager
-                .loadNativeAd(
-                    0,
-                    AdKeyPosition.NativeAd_ScMain.name,
-                    binding.nativeAdContainerView,
-                    R.layout.layout_native_ad,
-                    isFullScreen = false
-                ).setListener(object : OnAdmListener {
-                    override fun onAdFailToLoaded(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdFailToLoaded(typeAds, keyPosition)
-                        stopShimmerLoading()
-                    }
+        mAdmManager
+            .loadNativeAd(
+                0,
+                AdKeyPosition.NativeAd_ScMain.name,
+                binding.nativeAdContainerView,
+                R.layout.layout_native_ad,
+                isFullScreen = false
+            )
+    }
 
-                    override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
-                        super.onAdLoaded(typeAds, keyPosition)
-                        stopShimmerLoading()
-                    }
-                })
-        }, 1000)
+    private fun loadBannerAd() {
+        mAdmManager.loadBannerAd(0, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
     }
 
     private fun startShimmerLoading() {
         binding.layoutNativeAdLoaderContainer.visibility = VISIBLE
     }
 
-    // Normally this should happen after a network request 😎
     private fun stopShimmerLoading() {
         binding.layoutNativeAdLoaderContainer.visibility = INVISIBLE
     }
 
     override fun onStart() {
         super.onStart()
+        mBillingClientLifecycle?.fetchSubPurchasedProducts()
         GlobalVariables.canShowOpenAd = true
     }
 
@@ -124,8 +196,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        mAdmManager.destroyAdByKeyPosition(TYPE_ADS.BannerAd, AdKeyPosition.BannerAd_ScMain.name)
-        mAdmManager.removeListener()
+        mAdmManager
+            .destroyAdByKeyPosition(TYPE_ADS.BannerAd, AdKeyPosition.BannerAd_ScMain.name)
+            .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScMain.name)
+            .removeListener()
+            .removeMainActivity()
+        mBillingClientLifecycle?.removeListener(this)
         super.onDestroy()
+    }
+
+    companion object{
+        val TAG = "MainActivity"
     }
 }

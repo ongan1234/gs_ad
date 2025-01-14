@@ -75,6 +75,7 @@ class OnboardPagerAdapter(
                     PreferencesManager.getInstance().saveShowOnBoard(true)
                     val intent = Intent(itemView.context, MainActivity::class.java)
                     itemView.context.startActivity(intent)
+                    (itemView.context as? OnBoardActivity)?.removeListener()
                     (itemView.context as? OnBoardActivity)?.finish()
                 } else {
                     val viewPager = itemView.parent as? RecyclerView

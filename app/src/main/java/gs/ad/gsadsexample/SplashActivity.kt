@@ -2,6 +2,7 @@ package gs.ad.gsadsexample
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -10,6 +11,11 @@ import gs.ad.gsadsexample.databinding.ActivitySplashBinding
 import gs.ad.utils.ads.AdmManager
 import gs.ad.utils.ads.OnAdmListener
 import gs.ad.utils.ads.TYPE_ADS
+import gs.ad.utils.google_iab.BillingClientLifecycle
+import gs.ad.utils.google_iab.OnBillingListener
+import gs.ad.utils.google_iab.enums.ErrorType
+import gs.ad.utils.google_iab.models.ProductInfo
+import gs.ad.utils.google_iab.models.PurchaseInfo
 import gs.ad.utils.utils.GlobalVariables
 import gs.ad.utils.utils.PreferencesManager
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +28,7 @@ import kotlinx.coroutines.withContext
 class SplashActivity : AppCompatActivity(), OnAdmListener {
     private lateinit var binding: ActivitySplashBinding
     private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this)}
+    private val mBillingClientLifecycle: BillingClientLifecycle? get() { return  (application as AppOwner).mBillingClientLifecycle ?: null}
 
     private var countLoadAd = 0
     private var totalLoadAd = 0
@@ -52,34 +59,53 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //        PreferencesManager.getInstance().saveShowOnBoard(false)
 
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //reset onboard
+        //PreferencesManager.getInstance().saveShowOnBoard(false)
+
+        //reset sub
+        PreferencesManager.getInstance().purchaseFailed()
 
         GlobalVariables.canShowOpenAd = false
-
-        mAdmManager.initUMP(gatherConsentFinished = {
-            loadProgress()
-        })
-
-        mAdmManager.setListener(this)
-
         binding.splashProcessBar.visibility = View.GONE
         binding.splashProcessBar.progress = 0
-    }
 
-    override fun onDestroy() {
-        mAdmManager.removeListener()
-        super.onDestroy()
+        mAdmManager.setListener(this@SplashActivity)
+
+        if (mBillingClientLifecycle == null){
+            mAdmManager.initUMP(gatherConsentFinished = {
+                loadProgress()
+            })
+        }else{
+            mBillingClientLifecycle?.setListener(this, eventListener = object: OnBillingListener {
+                override fun onProductDetailsFetched(productInfos: HashMap<String, ProductInfo>) {
+                    super.onProductDetailsFetched(productInfos)
+
+                    mBillingClientLifecycle?.fetchSubPurchasedProducts()
+                }
+
+                override fun onPurchasedProductsFetched(purchaseInfos: List<PurchaseInfo>) {
+                    super.onPurchasedProductsFetched(purchaseInfos)
+                    mAdmManager.initUMP(gatherConsentFinished = {
+                        loadProgress()
+                    })
+                }
+
+                override fun onBillingError(errorType: ErrorType) {
+                    super.onBillingError(errorType)
+                }
+            })
+        }
+
     }
 
     private fun loadProgress(){
-        val progressBar = binding.splashProcessBar
-        progressBar.visibility = View.VISIBLE
-
         if (!PreferencesManager.getInstance().isSUB() ) {
+            val progressBar = binding.splashProcessBar
+            progressBar.visibility = View.VISIBLE
             if(PreferencesManager.getInstance().isShowOnBoard()) adPosition.removeAll{it.typeAds == TYPE_ADS.NativeAd}
 
             var countLoadedAd = 0
@@ -146,6 +172,8 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
             else Intent(this, OnBoardActivity::class.java)
         MainScope().launch {
             startActivity(intent)
+            mAdmManager.removeListener()
+            mBillingClientLifecycle?.removeListener(this@SplashActivity)
             finish()
         }
     }

@@ -1,10 +1,12 @@
 package gs.ad.utils.ads
 
 import android.app.Activity
+import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,10 +32,11 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 class AdmMachine(
-    val context: Context,
-    val config: AdmConfig
+    val context: Context, val config: AdmConfig
 ) {
-    private lateinit var currentActivity: Activity
+
+    private var mainActivity: Activity? = null
+    private var currentActivity: Activity? = null
     private var dialogLoadAds: Dialog? = null
     private var countDownTimerLoadAds: CountDownTimer? = null
     private var countTimeShowAds: Int = 0
@@ -47,63 +50,79 @@ class AdmMachine(
     private lateinit var mAdmInterstitialAd: AdmInterstitialAd
     private lateinit var mAdmRewardAd: AdmobRewardAd
     private lateinit var mAdmAppOpenAd: AdmOpenAd
+
+    private var mListActivity: MutableList<String> = mutableListOf()
     private var mHandleEvent: HashMap<String, OnAdmListener> = HashMap()
 
-    private val canLoadOpenAd = AtomicBoolean(false)
-    private val eventAdsManager: OnAdmListener?
+    private val keyEvent: String
         get() {
-            val key = keyEvent ?: return null
-            return mHandleEvent[key]
-        }
-
-    private val keyEvent: String?
-        get() {
-            val act = getCurrentActivity() ?: return null
+            val act = getCurrentActivity()
             val key = act::class.java.simpleName
             return key
         }
 
+    private val eventManager: OnAdmListener?
+        get(){
+            return mHandleEvent[keyEvent]
+        }
 
     private constructor(builder: Builder) : this(builder.context, builder.config) {
         mBannerAd = AdmBannerAd(builder.context, this, builder.config.listBannerAdUnitID)
         mNativeAd = AdmNativeAd(builder.context, this, builder.config.listNativeAdUnitID)
-        mAdmInterstitialAd = AdmInterstitialAd(builder.context, this, builder.config.listInterstitialAdUnitID)
+        mAdmInterstitialAd =
+            AdmInterstitialAd(builder.context, this, builder.config.listInterstitialAdUnitID)
         mAdmRewardAd = AdmobRewardAd(builder.context, this, builder.config.listRewardAdUnitID)
         mAdmAppOpenAd = AdmOpenAd(builder.context, this, builder.config.listOpenAdUnitID)
         Prefs.init(builder.context)
     }
 
-     fun getCurrentActivity(): Activity {
-        return currentActivity
+    fun getCurrentActivity(): Activity {
+        val act = currentActivity ?: mainActivity!!
+        Log.d(TAG, "getCurrentActivity: " + act::class.java.simpleName)
+        return act
     }
 
-     fun setActivity(activity: Activity) {
+    fun isMainActivity(activity: Activity){
+        mainActivity = activity
+    }
+
+    fun removeMainActivity(){
+        mainActivity = null
+    }
+
+    fun setActivity(activity: Activity) {
         currentActivity = activity
     }
 
-     fun setListener(event: OnAdmListener) {
-         val key = keyEvent ?: return
-         mHandleEvent[key] = event
+    fun setListener(event: OnAdmListener) {
+        val key = keyEvent
+        mHandleEvent[key] = event
     }
 
-    fun removeListener(){
-        val key = keyEvent ?: return
-        mHandleEvent.remove(key)
+    fun removeListener() {
+        try {
+            val key = keyEvent
+            mHandleEvent.remove(key)
+            currentActivity = null
+        }catch(e : Exception) {
+            Log.d(TAG, "removeListener: " + e.localizedMessage)
+        }
     }
 
-     fun showInterstitialAd(keyPosition: String) {
+    fun showInterstitialAd(keyPosition: String) {
         showPopupLoadAds(TYPE_ADS.InterstitialAd, keyPosition)
     }
 
-     fun showRewardAd(keyPosition: String) {
+    fun showRewardAd(keyPosition: String) {
         showPopupLoadAds(TYPE_ADS.RewardAd, keyPosition)
     }
 
-     fun showAds() {
+    fun showAds() {
         getCurrentActivity().runOnUiThread { delEventDialogLoadAds() }
     }
 
-     fun closeAds(typeAds: TYPE_ADS, keyPosition: String) {
+    fun closeAds(typeAds: TYPE_ADS, keyPosition: String) {
+        Log.d(TAG, "closeAds: " + typeAds.name + ", position: " + keyPosition)
         if (typeAds != TYPE_ADS.BannerAd && typeAds != TYPE_ADS.NativeAd) {
             mBannerAd.showAdView()
             mNativeAd.showAdView()
@@ -111,39 +130,51 @@ class AdmMachine(
 
         GlobalVariables.isShowPopup = false
         delEventDialogLoadAds()
-        eventAdsManager?.onAdClosed(typeAds, keyPosition)
+
+        eventManager?.onAdClosed(typeAds, keyPosition)
     }
 
-     fun haveReward(typeAds: TYPE_ADS, keyPosition: String) {
-        eventAdsManager?.onAdHaveReward(typeAds, keyPosition)
+    fun haveReward(typeAds: TYPE_ADS, keyPosition: String) {
+        Log.d(TAG, "haveReward: " + typeAds.name + ", position: " + keyPosition)
+
+        eventManager?.onAdHaveReward(typeAds, keyPosition)
     }
 
-     fun notHaveReward(typeAds: TYPE_ADS, keyPosition: String) {
-        eventAdsManager?.onAdNotHaveReward(typeAds, keyPosition)
+    fun notHaveReward(typeAds: TYPE_ADS, keyPosition: String) {
+        Log.d(TAG, "notHaveReward: " + typeAds.name + ", position: " + keyPosition)
+
+        eventManager?.onAdNotHaveReward(typeAds, keyPosition)
     }
 
-     fun onAdFailToLoaded(typeAds: TYPE_ADS, keyPosition: String) {
-        eventAdsManager?.onAdFailToLoaded(typeAds, keyPosition)
+    fun onAdFailToLoaded(typeAds: TYPE_ADS, keyPosition: String) {
+        Log.d(TAG, "onAdFailToLoaded: " + typeAds.name + ", position: " + keyPosition)
+
+        eventManager?.onAdFailToLoaded(typeAds, keyPosition)
     }
 
-     fun onAdShow(typeAds: TYPE_ADS, keyPosition: String) {
+    fun onAdShow(typeAds: TYPE_ADS, keyPosition: String) {
+        Log.d(TAG, "onAdShow: " + typeAds.name + ", position: " + keyPosition)
         if (typeAds != TYPE_ADS.BannerAd && typeAds != TYPE_ADS.NativeAd) {
             mBannerAd.hideAdView()
             mNativeAd.hideAdView()
         }
 
-        eventAdsManager?.onAdShowed(typeAds, keyPosition)
+        eventManager?.onAdShowed(typeAds, keyPosition)
     }
 
-     fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
-        eventAdsManager?.onAdLoaded(typeAds, keyPosition)
+    fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
+        Log.d(TAG, "onAdLoaded: " + typeAds.name + ", position: " + keyPosition)
+
+        eventManager?.onAdLoaded(typeAds, keyPosition)
     }
 
-     fun onAdClicked(typeAds: TYPE_ADS, keyPosition: String) {
-        eventAdsManager?.onAdClicked(typeAds, keyPosition)
+    fun onAdClicked(typeAds: TYPE_ADS, keyPosition: String) {
+        Log.d(TAG, "onAdClicked: " + typeAds.name + ", position: " + keyPosition)
+
+        eventManager?.onAdClicked(typeAds, keyPosition)
     }
 
-     fun countToShowAds(typeAds: TYPE_ADS, keyPosition: String, startAds: Int, loopAds: Int) {
+    fun countToShowAds(typeAds: TYPE_ADS, keyPosition: String, startAds: Int, loopAds: Int) {
         if (PreferencesManager.getInstance().isSUB()) {
             closeAds(typeAds, keyPosition)
             return
@@ -152,13 +183,12 @@ class AdmMachine(
         var countFullAds = PreferencesManager.getInstance().getCounterAds(keyPosition)
         countFullAds += 1
         PreferencesManager.getInstance().saveCounterAds(keyPosition, countFullAds)
-        var isShowAds = false
-        isShowAds = if (countFullAds < startAds) {
+        val isShowAds = if (countFullAds < startAds) {
             false
-        } else if (countFullAds == startAds.toLong()) {
+        } else if (countFullAds == startAds) {
             true
         } else {
-            (countFullAds - startAds) % loopAds == 0L
+            (countFullAds - startAds) % loopAds == 0
         }
 
         if (isShowAds) {
@@ -174,8 +204,13 @@ class AdmMachine(
             return
         }
 
+        if (typeAds == TYPE_ADS.InterstitialAd && PreferencesManager.getInstance().isSUB()){
+            closeAds(typeAds, keyPosition)
+            return
+        }
+
         GlobalVariables.isShowPopup = true
-        dialogLoadAds = Dialog(getCurrentActivity()!!)
+        dialogLoadAds = Dialog(getCurrentActivity())
         dialogLoadAds?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialogLoadAds?.setCancelable(false)
         dialogLoadAds?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -244,38 +279,27 @@ class AdmMachine(
     }
 
     fun showOpenAd(keyPosition: String) {
-        if (!canLoadOpenAd.get()) {
-            canLoadOpenAd.set(true)
-            return
-        }
-        Log.d(
-            TAG,
-            "ON_RESUME App in foreground " + GlobalVariables.isShowSub + "," + GlobalVariables.isShowPopup
+        if (googleMobileAdsConsentManager.canRequestAds && GlobalVariables.AdsKeyPositionAllow[keyPosition] == true) mAdmAppOpenAd.showAds(
+            keyPosition
         )
-        if (GlobalVariables.isShowSub) return
-        if (GlobalVariables.isShowPopup) return
-        if (!GlobalVariables.canShowOpenAd) return
-
-        if (googleMobileAdsConsentManager.canRequestAds && GlobalVariables.AdsKeyPositionAllow[keyPosition] == true) mAdmAppOpenAd.showAds(keyPosition)
     }
 
     fun preloadNativeAd(id: Int = 0, keyPosition: String, isFullScreen: Boolean) {
-        if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds)
-            mNativeAd.preloadAd(id, keyPosition, isFullScreen)
-        else
-            mNativeAd.destroyView()
+        if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) mNativeAd.preloadAd(
+            id,
+            keyPosition,
+            isFullScreen
+        )
+        else mNativeAd.destroyView()
     }
 
     fun applyNativeAdView(
-        keyPosition: String,
-        container: ConstraintLayout,
-        layoutId: Int
+        keyPosition: String, container: ConstraintLayout, layoutId: Int
     ) {
         if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) {
             val nativeAdView = LayoutInflater.from(context).inflate(layoutId, null) as NativeAdView
             mNativeAd.applyNativeAdView(keyPosition, container, nativeAdView)
-        } else
-            mNativeAd.destroyView()
+        } else mNativeAd.destroyView()
     }
 
     fun loadNativeAd(
@@ -287,8 +311,7 @@ class AdmMachine(
     ) {
         if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) {
             mNativeAd.loadAd(id, keyPosition, container, layoutNativeAdViewId, isFullScreen)
-        } else
-            mNativeAd.destroyView()
+        } else mNativeAd.destroyView()
     }
 
     fun destroyNativeAdByKeyPosition(keyPosition: String) {
@@ -296,10 +319,12 @@ class AdmMachine(
     }
 
     fun loadBannerAd(id: Int = 0, keyPosition: String, container: ConstraintLayout) {
-        if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds)
-            mBannerAd.loadBanner(id, keyPosition, container)
-        else
-            mBannerAd.destroyView()
+        if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) mBannerAd.loadBanner(
+            id,
+            keyPosition,
+            container
+        )
+        else mBannerAd.destroyView()
     }
 
     fun destroyBannerAdByKeyPosition(keyPosition: String) {
@@ -315,53 +340,40 @@ class AdmMachine(
     }
 
     private fun showPopupNetworkError(
-        isTestUMP: Boolean,
-        hashID: String,
-        gatherConsentFinished: () -> Unit
+        isTestUMP: Boolean, hashID: String, gatherConsentFinished: () -> Unit
     ) {
         if (NetworkUtil.isNetworkAvailable(context)) return
-        AlertDialog.Builder(getCurrentActivity()!!)
-            .setTitle("Network error")
+        AlertDialog.Builder(getCurrentActivity()!!).setTitle("Network error")
             .setMessage("The connection to the network is impossible. Please check the status of your connection or try again in a few minutes.")
-            .setCancelable(false)
-            .setPositiveButton(
+            .setCancelable(false).setPositiveButton(
                 "OK"
             ) { _, _ ->
                 clickPopupNetworkErrorButtonOK(
-                    isTestUMP,
-                    hashID,
-                    gatherConsentFinished
+                    isTestUMP, hashID, gatherConsentFinished
                 )
-            }
-            .create()
-            .show()
+            }.create().show()
     }
 
 
     private fun clickPopupNetworkErrorButtonOK(
-        isTestUMP: Boolean,
-        hashID: String,
-        gatherConsentFinished: () -> Unit
+        isTestUMP: Boolean, hashID: String, gatherConsentFinished: () -> Unit
     ) {
         initUMP(isTestUMP, hashID, gatherConsentFinished)
     }
 
     fun initUMP(
         isTestUMP: Boolean = false,
-        hashID: String = "AF6B8FFE15C0A60C3C1657041484F04E",
+        hashID: String = "",
         gatherConsentFinished: () -> Unit
     ) {
         if (NetworkUtil.isNetworkAvailable(context)) {
             googleMobileAdsConsentManager.gatherConsent(
-                getCurrentActivity(),
-                isTestUMP,
-                hashID
+                getCurrentActivity(), isTestUMP, hashID
             ) { consentError ->
                 if (consentError != null) {
                     // Consent not obtained in current session.
                     Log.d(
-                        TAG,
-                        String.format("%s: %s", consentError.errorCode, consentError.message)
+                        TAG, String.format("%s: %s", consentError.errorCode, consentError.message)
                     )
                 }
 
@@ -376,14 +388,12 @@ class AdmMachine(
         }
     }
 
-    fun resetInitUMP(){
+    fun resetInitUMP() {
         isMobileAdsInitializeCalled.set(false)
     }
 
     private fun initializeMobileAdsSdk(
-        isTestUMP: Boolean,
-        hashID: String,
-        gatherConsentFinished: () -> Unit
+        isTestUMP: Boolean, hashID: String, gatherConsentFinished: () -> Unit
     ) {
         if (isMobileAdsInitializeCalled.getAndSet(true)) {
             return
@@ -393,9 +403,7 @@ class AdmMachine(
         if (isTestUMP) {
             // Set your test devices.
             MobileAds.setRequestConfiguration(
-                RequestConfiguration.Builder()
-                    .setTestDeviceIds(listOf(hashID))
-                    .build()
+                RequestConfiguration.Builder().setTestDeviceIds(listOf(hashID)).build()
             )
         }
 

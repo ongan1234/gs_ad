@@ -118,7 +118,7 @@ internal class AdmobRewardAd(
                 act
             ) { isReward = true }
         } else {
-            Log.d("TAG", "The interstitial ad wasn't ready yet.")
+            Log.d("TAG", "The reward ad wasn't ready yet.")
             //            adsManager.activity.closeAds(TYPE_ADS.RewardAd);
 //            loadAds();
         }

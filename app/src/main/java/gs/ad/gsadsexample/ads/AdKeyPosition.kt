@@ -7,6 +7,7 @@ enum class AdKeyPosition {
     BannerAd_ScMain,
     NativeAd_ScMain,
     NativeAd_ScMain2,
+    InterstitialAd_ScMain_CountShowAd,
     InterstitialAd_ScMain,
     RewardAd_ScMain,
     InterstitialAd_ScMain2,

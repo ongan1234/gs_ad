@@ -1,5 +1,6 @@
 package gs.ad.utils.ads
 
+import android.app.Activity
 import androidx.constraintlayout.widget.ConstraintLayout
 import gs.ad.utils.utils.PreferencesManager
 
@@ -10,13 +11,13 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         PreferencesManager.getInstance().resetCounterAds(keyCount)
     }
 
-    fun getCounterAds(keyCount: String): Long{
+    fun getCounterAds(keyCount: String): Int{
         return PreferencesManager.getInstance().getCounterAds(keyCount)
     }
 
     fun initUMP(
         isTestUMP: Boolean = false,
-        hashID: String = "AF6B8FFE15C0A60C3C1657041484F04E",
+        hashID: String = "",
         gatherConsentFinished: () -> Unit
     ) {
         mAdmMachine.initUMP(isTestUMP, hashID, gatherConsentFinished)
@@ -26,67 +27,62 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         mAdmMachine.resetInitUMP()
     }
 
-    fun setListener(event: OnAdmListener): AdmManager {
+    fun setListener(event: OnAdmListener){
         mAdmMachine.setListener(event)
-        return this
     }
 
-    fun removeListener() {
+    fun removeListener():AdmManager {
         mAdmMachine.removeListener()
+        return this
     }
 
-    fun preloadInterstitialAd(): AdmManager {
+    fun removeMainActivity():AdmManager{
+        mAdmMachine.removeMainActivity()
+        return this
+    }
+
+    fun preloadInterstitialAd(){
         mAdmMachine.preloadInterstitialAd()
-        return this
     }
 
-    fun preloadRewardAd(): AdmManager {
+    fun preloadRewardAd() {
         mAdmMachine.preloadRewardAd()
-        return this
     }
 
-    fun preloadOpenAd(): AdmManager {
+    fun preloadOpenAd() {
         mAdmMachine.preloadOpenAd()
-        return this
     }
 
-    fun countToShowInterstitialAd(keyPosition: String, firstShowAd: Int, loopShowAd: Int): AdmManager {
+    fun countToShowInterstitialAd(keyPosition: String, firstShowAd: Int, loopShowAd: Int) {
         mAdmMachine.countToShowAds(TYPE_ADS.InterstitialAd, keyPosition, firstShowAd, loopShowAd)
-        return this
     }
 
-    fun countToShowRewardAd(keyPosition: String, firstShowAd: Int, loopShowAd: Int): AdmManager {
+    fun countToShowRewardAd(keyPosition: String, firstShowAd: Int, loopShowAd: Int) {
         mAdmMachine.countToShowAds(TYPE_ADS.RewardAd, keyPosition, firstShowAd, loopShowAd)
-        return this
     }
 
-    fun showOpenAd(keyPosition: String): AdmManager {
+    fun showOpenAd(keyPosition: String) {
         mAdmMachine.showOpenAd(keyPosition)
-        return this
     }
 
-    fun showInterstitialAd(keyPosition: String): AdmManager {
+    fun showInterstitialAd(keyPosition: String) {
         mAdmMachine.showInterstitialAd(keyPosition)
-        return this
     }
 
-    fun showRewardAd(keyPosition: String): AdmManager {
+    fun showRewardAd(keyPosition: String) {
         mAdmMachine.showRewardAd(keyPosition)
-        return this
     }
 
-    fun preloadNativeAd(id: Int = 0, keyPosition: String, isFullScreen: Boolean): AdmManager {
+    fun preloadNativeAd(id: Int = 0, keyPosition: String, isFullScreen: Boolean) {
         mAdmMachine.preloadNativeAd(id, keyPosition, isFullScreen)
-        return this
     }
 
     fun applyNativeAdView(
         keyPosition: String,
         container: ConstraintLayout,
         layoutId: Int
-    ): AdmManager {
+    ) {
         mAdmMachine.applyNativeAdView(keyPosition, container, layoutId)
-        return this
     }
 
     fun loadNativeAd(
@@ -95,14 +91,12 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         container: ConstraintLayout,
         layoutId: Int,
         isFullScreen: Boolean
-    ): AdmManager {
+    ) {
         mAdmMachine.loadNativeAd(id, keyPosition, container, layoutId, isFullScreen)
-        return this
     }
 
-    fun loadBannerAd(id: Int = 0, keyPosition: String, container: ConstraintLayout): AdmManager {
+    fun loadBannerAd(id: Int = 0, keyPosition: String, container: ConstraintLayout) {
         mAdmMachine.loadBannerAd(id, keyPosition, container)
-        return this
     }
 
     fun destroyAdByKeyPosition(typeAds: TYPE_ADS, keyPosition: String): AdmManager {
@@ -116,14 +110,12 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         return this
     }
 
-    fun pauseBannerAdView(): AdmManager {
+    fun pauseBannerAdView() {
         mAdmMachine.pauseBannerAdView()
-        return this
     }
 
-    fun resumeBannerAdView(): AdmManager {
+    fun resumeBannerAdView() {
         mAdmMachine.resumeBannerAdView()
-        return this
     }
 
     companion object {

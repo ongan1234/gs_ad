@@ -47,11 +47,10 @@ internal class AdmNativeAd(
 
     private var mListAdmModel: MutableList<AdmModel> = ArrayList()
 
-    private val keyPosition: String
-        get() {
-            val model = currentModel ?: return ""
-            return model.keyPosition
-        }
+    private val keyPosition: String get() {
+        val model = currentModel ?: return "null"
+        return model.keyPosition
+    }
 
     private val currentModel: AdmModel?
         get() {
@@ -60,7 +59,7 @@ internal class AdmNativeAd(
             val model =
                 mListAdmModel.stream().filter { md -> md.nameActivity == nameActivity }.findFirst()
                     .orElse(null)
-            return currentModel() ?: model
+            return model ?: currentModel()
         }
 
     private fun currentModel(): AdmModel? {
@@ -70,7 +69,7 @@ internal class AdmNativeAd(
         return model
     }
 
-    private fun currentModelByKeyPosition(keyPosition: String): AdmModel? {
+    fun currentModelByKeyPosition(keyPosition: String): AdmModel? {
         val model =
             mListAdmModel.stream().filter { md -> md.keyPosition == keyPosition }.findFirst()
                 .orElse(null)
@@ -82,17 +81,20 @@ internal class AdmNativeAd(
     private var keyPositionPreloaded: String? = null
 
     fun preloadAd(id: Int, keyPosition: String, isFullScreen: Boolean) {
-        if (listNativeAdUnitId.isEmpty()) return
-        if (id >= listNativeAdUnitId.count()) return
-        if (!NetworkUtil.isNetworkAvailable(context)) return
-        val act = admMachine.getCurrentActivity() ?: return
-        if (currentModelByKeyPosition(keyPosition) != null) return
-        if (currentModelByKeyPosition(keyPosition)?.nativeAd != null) {
+        if (listNativeAdUnitId.isEmpty() ||
+            id >= listNativeAdUnitId.count() ||
+            !NetworkUtil.isNetworkAvailable(context) ||
+            admMachine.getCurrentActivity().isFinishing ||
+            admMachine.getCurrentActivity().isDestroyed ||
+            currentModelByKeyPosition(keyPosition) != null ||
+            currentModelByKeyPosition(keyPosition)?.nativeAd != null) {
             admMachine.onAdFailToLoaded(TYPE_ADS.NativeAd, keyPosition)
             return
         }
+
         if (PreferencesManager.getInstance().isSUB()) return
 
+        val act = admMachine.getCurrentActivity()
         mListAdmModel.add(
             AdmModel(
                 act::class.java.simpleName,
@@ -156,14 +158,21 @@ internal class AdmNativeAd(
         layoutNativeAdView: Int,
         isFullScreen: Boolean
     ) {
-        destroyView(keyPosition)
+//        destroyView(keyPosition)
 
-        if (listNativeAdUnitId.isEmpty()) return
-        if (id >= listNativeAdUnitId.count()) return
-        if (!NetworkUtil.isNetworkAvailable(context)) return
-        val act = admMachine.getCurrentActivity() ?: return
+        if (listNativeAdUnitId.isEmpty() ||
+            id >= listNativeAdUnitId.count() ||
+            !NetworkUtil.isNetworkAvailable(context) ||
+            currentModelByKeyPosition(keyPosition) != null ||
+            admMachine.getCurrentActivity().isDestroyed ||
+            admMachine.getCurrentActivity().isFinishing
+            ){
+            admMachine.onAdFailToLoaded(TYPE_ADS.NativeAd, keyPosition)
+            return
+        }
         if (PreferencesManager.getInstance().isSUB()) return
 
+        val act = admMachine.getCurrentActivity()
         adContainerView.visibility = GONE
 
         val nativeAdView =
