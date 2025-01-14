@@ -93,12 +93,6 @@ mAdmManager.initUMP(gatherConsentFinished = {
 Gọi Load Ad:
 ```kotlin
 mAdmManager.loadBannerAd(-1, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
-            .setListener(object : OnAdmListener {
-                override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
-                    super.onAdLoaded(typeAds, keyPosition)
-                }
-            })
-})
 ```
 
 BannerAd Lifecycle
@@ -133,12 +127,6 @@ mAdmManager.applyNativeAdView(AdKeyPosition.NativeAd_ScOnBoard_1.name, adContain
 ### InterstitialAd
 ```kotlin
 mAdmManager.showInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name)
-     .setListener(object : OnAdmListener {
-          override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-               super.onAdClosed(typeAds, keyPosition)
-               //TODO
-          }
-     })
 ```
 
 Sử dụng ***countToShowInterstitialAd*** với trường hợp đếm tương tác nhiêu nút bấm trên 1 màn hình, với firstShowAd là số lần phải tương tác các nút bấm trong lần đầu tiên để show ad, loopShowAd là số lần khi tương tác lại các nút bấm đó để show lại ad :
@@ -157,12 +145,6 @@ Muốn reset lại số lần thì sử dụng:
 ### RewardAd
 ```kotlin
 mAdmManager.showRewardAd(AdKeyPosition.RewardAd_ScMain.name)
-     .setListener(object : OnAdmListener {
-          override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
-               super.onAdClosed(typeAds, keyPosition)
-               //TODO
-          }
-     })
 ```
 
 ### OpenAd
