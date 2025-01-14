@@ -74,7 +74,12 @@ Tạo 1 **AppOwner.kt** và thêm vào **AndroidManifest.xml** như hình:
 
 Sử dụng **AdmManager** trong các Activity
 ```kotlin
-private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this)}
+private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.getActivity(this) }
+```
+
+Nếu là Activity main ko finish thì khởi tạo như sau
+```kotlin
+private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.isMainActivity(this) }
 ```
 
 Phải khởi tạo UMP trước khi sử dụng Ad, nên dùng ở trong màn Splash
@@ -108,28 +113,21 @@ override fun onPause() {
      mAdmManager.pauseBannerAdView()
 }
 
-override fun onDestroy() {
-     mAdmManager.destroyAdByKeyPosition(TYPE_ADS.BannerAd, AdKeyPosition.BannerAd_ScMain.name)
-     mAdmManager.removeListener()
-     super.onDestroy()
-}
 ```
 
 ### NativeAd
 Gọi Load Ad:
 ```kotlin
-mAdmManager.loadNativeAd(0, AdKeyPosition.NativeAd_ScMain2.name, binding.nativeAdContainerView, R.layout.layout_native_ad_origin,
+mAdmManager.loadNativeAd(-1, AdKeyPosition.NativeAd_ScMain2.name, binding.nativeAdContainerView, R.layout.layout_native_ad_origin,
      isFullScreen = false
 )
 ```
-
-NativeAd Lifecycle
+Gọi Preload và dùng ApplyView:
 ```kotlin
-override fun onDestroy() {
-     mAdmManager.destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScMain2.name)
-     mAdmManager.removeListener()
-     super.onDestroy()
-}
+mAdmManager.preloadNativeAd(-1, AdKeyPosition.NativeAd_ScOnBoard_1.name, isFullScreen = false)
+```
+```kotlin
+mAdmManager.applyNativeAdView(AdKeyPosition.NativeAd_ScOnBoard_1.name, adContainer, R.layout.layout_native_ad_full)
 ```
 
 ### InterstitialAd
@@ -141,6 +139,19 @@ mAdmManager.showInterstitialAd(AdKeyPosition.InterstitialAd_ScMain.name)
                //TODO
           }
      })
+```
+
+Sử dụng ***countToShowInterstitialAd*** với trường hợp đếm tương tác nhiêu nút bấm trên 1 màn hình, với firstShowAd là số lần phải tương tác các nút bấm trong lần đầu tiên để show ad, loopShowAd là số lần khi tương tác lại các nút bấm đó để show lại ad :
+```kotlin
+mAdmManager.countToShowInterstitialAd(
+                AdKeyPosition.InterstitialAd_ScMain_CountShowAd.name,
+                firstShowAd = 3,
+                loopShowAd = 2
+            )
+```
+Muốn reset lại số lần thì sử dụng:
+```kotlin
+     mAdmBuilder.resetCounterAds(AdKeyPosition.InterstitialAd_ScMain.name)
 ```
 
 ### RewardAd
@@ -163,18 +174,92 @@ override fun onStart() {
 }
 ```
 
-
 OpenAd ở các màn **Splash, Subscription, OnBoard** ko nên hiện thì để ***GlobalVariables.canShowOpenAd = false***
 
-
 ### Lưu ý
-Về setListener có thể dùng ***mAdmManager.setListener(this)*** hoặc dùng như trên và sau khi finish Activity thì phải ***removeListener*** như sau:
+Sử dụng setListener ở onCreate 1 activity như sau:
+```kotlin
+override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mAdmManager.setListener(this)
+}
+```
+
+Dùng ***removeListener*** trước finish 1 activity như sau:
+```kotlin
+     mAdmManager
+            .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScMain2.name)
+            .removeListener()
+     finish()
+```
+
+Đối với activity main thì để trong ***onDestroy*** như sau:
+```kotlin
+     override fun onDestroy() {
+        mAdmManager
+            .destroyAdByKeyPosition(TYPE_ADS.BannerAd, AdKeyPosition.BannerAd_ScMain.name)
+            .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScMain.name)
+            .removeListener()
+            .removeMainActivity()
+        super.onDestroy()
+    }
+```
+
+# Sub
+## Cách sử dụng
+Tạo các 4 file Product Id như hình:
+![plot](./images/SubProductId.png)
+
+Tạo 1 **AppOwner.kt** như hình:
+![plot](./images/SubAppOwner.png)
+
+Khởi tạo ***BillingClientLifecycle*** trong các activity
+```kotlin
+private val mBillingClientLifecycle: BillingClientLifecycle? get() { return  (application as AppOwner).mBillingClientLifecycle ?: null}
+```
+
+Gọi ***setListener*** trong onCreate ở các activity như sau:
+```kotlin
+mBillingClientLifecycle?.setListener(this, object : OnBillingListener {
+            override fun onPurchasedProductsFetched(purchaseInfos: List<PurchaseInfo>) {
+                super.onPurchasedProductsFetched(purchaseInfos)
+            }
+        })
+```
+Dùng ***removeListener*** trước finish 1 activity như sau:
+```kotlin
+     mBillingClientLifecycle?.removeListener(this)
+     finish()
+```
+Đối với activity main như sau:
 ```kotlin
 override fun onDestroy() {
-     mAdmManager.removeListener()
+     mBillingClientLifecycle?.removeListener(this)
      super.onDestroy()
 }
 ```
 
+Lấy giá item Sub và iap như sau:
+```kotlin
+mBillingClientLifecycle.getSubscriptionPrice(SubscriptionProductId.Weekly.id)
+```
+```kotlin
+mBillingClientLifecycle.getIAPPrice(ConsumableProductId.Lifetime.id)
+```
 
+Mua gói Sub và Lifetime sử dụng như sau:
+```kotlin
+mBillingClientLifecycle.subscribe(this@SubscriptionActivity, ConsumableProductId.Lifetime.id)
+```
+```kotlin
+mBillingClientLifecycle.purchaseLifetime(this@SubscriptionActivity, SubscriptionProductId.Weekly.id)
+```
+
+Sử dụng ***fetchSubPurchasedProducts*** để check Sub có tồn tại ko
+```kotlin
+mBillingClientLifecycle?.fetchSubPurchasedProducts()
+```
+
+## Tải bản mẫu về xem
+https://github.com/ongan1234/gs_ad/archive/refs/heads/main.zip
 

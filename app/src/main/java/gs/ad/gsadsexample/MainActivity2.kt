@@ -68,7 +68,7 @@ class MainActivity2 : AppCompatActivity() {
         }
 
         mAdmManager
-            .loadNativeAd(0, AdKeyPosition.NativeAd_ScMain2.name, binding.nativeAdContainerView, R.layout.layout_native_ad_origin,
+            .loadNativeAd(-1, AdKeyPosition.NativeAd_ScMain2.name, binding.nativeAdContainerView, R.layout.layout_native_ad_origin,
                 isFullScreen = false
             )
     }

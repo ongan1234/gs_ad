@@ -57,8 +57,7 @@ class SubscriptionActivity : AppCompatActivity() {
 
         binding?.subWeeklyValue?.text = mBillingClientLifecycle.getSubscriptionPrice(SubscriptionProductId.Weekly.id)
         binding?.subYearlyValue?.text = mBillingClientLifecycle.getSubscriptionPrice(SubscriptionProductId.Yearly.id)
-        binding?.subLifetimeValue?.text = mBillingClientLifecycle.getIAPPrice(
-            ConsumableProductId.Lifetime.id)
+        binding?.subLifetimeValue?.text = mBillingClientLifecycle.getIAPPrice(ConsumableProductId.Lifetime.id)
 
         clickOps1()
         setListeners()

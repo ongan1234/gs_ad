@@ -7,6 +7,7 @@ import android.view.View
 import android.view.WindowMetrics
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -54,6 +55,7 @@ internal class AdmBannerAd(
     }
 
     private val listBannerAdUnitId: List<String> = listBannerAdUnitID
+    private var countTier : Int = 0
 
     // [START get_ad_size]
     // Get the ad size with screen width.
@@ -73,7 +75,7 @@ internal class AdmBannerAd(
             return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(act, adWidth)
         }
 
-    fun loadBanner(id : Int, keyPosition: String, adContainerView: ConstraintLayout) {
+    fun loadBanner(id : Int = -1, keyPosition: String, adContainerView: ConstraintLayout) {
 //        destroyView(keyPosition)
 
         if (listBannerAdUnitId.isEmpty() ||
@@ -92,7 +94,13 @@ internal class AdmBannerAd(
         // Create a new ad view.
         val mAdView = AdView(act)
         mAdView.setAdSize(adSize)
-        mAdView.adUnitId = listBannerAdUnitId[id]
+        val unitAdId = if(id == -1) countTier else id
+        mAdView.adUnitId = listBannerAdUnitId[unitAdId]
+        if (countTier >= listBannerAdUnitId.size - 1) {
+            countTier = 0
+        } else {
+            countTier++
+        }
         mAdView.adListener = this
 
 //        val textView = TextView(act)

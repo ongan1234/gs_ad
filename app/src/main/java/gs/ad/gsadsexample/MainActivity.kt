@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity(), OnAdmListener {
         startShimmerLoading()
         mAdmManager
             .loadNativeAd(
-                0,
+                -1,
                 AdKeyPosition.NativeAd_ScMain.name,
                 binding.nativeAdContainerView,
                 R.layout.layout_native_ad,
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), OnAdmListener {
     }
 
     private fun loadBannerAd() {
-        mAdmManager.loadBannerAd(0, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
+        mAdmManager.loadBannerAd(-1, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
     }
 
     private fun startShimmerLoading() {

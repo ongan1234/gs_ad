@@ -30,13 +30,10 @@ class AdmBuilder(
     }
 
     private val canLoadOpenAd = AtomicBoolean(false)
-    private var currentActivity: Activity? = null
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         Log.d(TAG, "owner onStart")
-
-        mBillingClientLifecycle?.fetchSubPurchasedProducts()
 
         if (!canLoadOpenAd.get()) {
             canLoadOpenAd.set(true)

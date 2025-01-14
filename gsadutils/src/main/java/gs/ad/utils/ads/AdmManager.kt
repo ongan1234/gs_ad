@@ -73,7 +73,7 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         mAdmMachine.showRewardAd(keyPosition)
     }
 
-    fun preloadNativeAd(id: Int = 0, keyPosition: String, isFullScreen: Boolean) {
+    fun preloadNativeAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean) {
         mAdmMachine.preloadNativeAd(id, keyPosition, isFullScreen)
     }
 
@@ -86,7 +86,7 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
     }
 
     fun loadNativeAd(
-        id: Int = 0,
+        id: Int = -1,
         keyPosition: String,
         container: ConstraintLayout,
         layoutId: Int,
@@ -95,7 +95,7 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         mAdmMachine.loadNativeAd(id, keyPosition, container, layoutId, isFullScreen)
     }
 
-    fun loadBannerAd(id: Int = 0, keyPosition: String, container: ConstraintLayout) {
+    fun loadBannerAd(id: Int = -1, keyPosition: String, container: ConstraintLayout) {
         mAdmMachine.loadBannerAd(id, keyPosition, container)
     }
 

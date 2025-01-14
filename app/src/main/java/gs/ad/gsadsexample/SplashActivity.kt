@@ -40,6 +40,7 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
         set(value) {
             field = value * 100 + 1000
         }
+    private var isInitUMP : Boolean = false
 
     private data class AdPreload(
         val typeAds: TYPE_ADS,
@@ -49,12 +50,12 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
     )
 
     private var adPosition: MutableList<AdPreload> = mutableListOf(
-        AdPreload(TYPE_ADS.OpenAd, 0, ""),
-        AdPreload(TYPE_ADS.InterstitialAd, 0, ""),
-        AdPreload(TYPE_ADS.NativeAd, 0, AdKeyPosition.NativeAd_ScOnBoard_1.name),
-        AdPreload(TYPE_ADS.NativeAd, 0, AdKeyPosition.NativeAd_ScOnBoard_2.name),
-        AdPreload(TYPE_ADS.NativeAd, 0, AdKeyPosition.NativeAd_ScOnBoard_3.name, true),
-        AdPreload(TYPE_ADS.NativeAd, 0, AdKeyPosition.NativeAd_ScOnBoard_4.name),
+        AdPreload(TYPE_ADS.OpenAd, -1, ""),
+        AdPreload(TYPE_ADS.InterstitialAd, -1, ""),
+        AdPreload(TYPE_ADS.NativeAd, -1, AdKeyPosition.NativeAd_ScOnBoard_1.name),
+        AdPreload(TYPE_ADS.NativeAd, -1, AdKeyPosition.NativeAd_ScOnBoard_2.name),
+        AdPreload(TYPE_ADS.NativeAd, -1, AdKeyPosition.NativeAd_ScOnBoard_3.name, true),
+        AdPreload(TYPE_ADS.NativeAd, -1, AdKeyPosition.NativeAd_ScOnBoard_4.name),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +68,7 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
         //PreferencesManager.getInstance().saveShowOnBoard(false)
 
         //reset sub
-        PreferencesManager.getInstance().purchaseFailed()
+        //PreferencesManager.getInstance().purchaseFailed()
 
         GlobalVariables.canShowOpenAd = false
         binding.splashProcessBar.visibility = View.GONE
@@ -80,15 +81,16 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
                 loadProgress()
             })
         }else{
+            isInitUMP = false
             mBillingClientLifecycle?.setListener(this, eventListener = object: OnBillingListener {
                 override fun onProductDetailsFetched(productInfos: HashMap<String, ProductInfo>) {
                     super.onProductDetailsFetched(productInfos)
-
                     mBillingClientLifecycle?.fetchSubPurchasedProducts()
                 }
-
                 override fun onPurchasedProductsFetched(purchaseInfos: List<PurchaseInfo>) {
                     super.onPurchasedProductsFetched(purchaseInfos)
+                    if(isInitUMP) return
+                    isInitUMP = true
                     mAdmManager.initUMP(gatherConsentFinished = {
                         loadProgress()
                     })
@@ -99,7 +101,11 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
                 }
             })
         }
+    }
 
+    override fun onStart() {
+        super.onStart()
+        mBillingClientLifecycle?.fetchSubPurchasedProducts()
     }
 
     private fun loadProgress(){

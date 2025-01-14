@@ -79,8 +79,9 @@ internal class AdmNativeAd(
     private val listNativeAdUnitId: List<String> = listNativeAdUnitID
     private val isMutedVideo: Boolean = true
     private var keyPositionPreloaded: String? = null
+    private var countTier: Int = 0
 
-    fun preloadAd(id: Int, keyPosition: String, isFullScreen: Boolean) {
+    fun preloadAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean) {
         if (listNativeAdUnitId.isEmpty() ||
             id >= listNativeAdUnitId.count() ||
             !NetworkUtil.isNetworkAvailable(context) ||
@@ -105,7 +106,14 @@ internal class AdmNativeAd(
             )
         )
 
-        val builder = AdLoader.Builder(context, listNativeAdUnitId[id])
+        val unitAdId = if(id == -1) countTier else id
+        val builder = AdLoader.Builder(context, listNativeAdUnitId[unitAdId])
+        if (countTier >= listNativeAdUnitId.size - 1) {
+            countTier = 0
+        } else {
+            countTier++
+        }
+
         builder.forNativeAd { nativeAd ->
             keyPositionPreloaded = keyPosition
 
@@ -152,7 +160,7 @@ internal class AdmNativeAd(
      * corresponding "populate" method when one is successfully returned.
      */
     fun loadAd(
-        id: Int,
+        id: Int = -1,
         keyPosition: String,
         adContainerView: ConstraintLayout,
         layoutNativeAdView: Int,
@@ -196,7 +204,13 @@ internal class AdmNativeAd(
             )
         )
 
-        val builder = AdLoader.Builder(context, listNativeAdUnitId[id])
+        val unitAdId = if(id == -1) countTier else id
+        val builder = AdLoader.Builder(context, listNativeAdUnitId[unitAdId])
+        if (countTier >= listNativeAdUnitId.size - 1) {
+            countTier = 0
+        } else {
+            countTier++
+        }
         builder.forNativeAd { nativeAd ->
             // You must call destroy on old ads when you are done with them,
             // otherwise you will have a memory leak.

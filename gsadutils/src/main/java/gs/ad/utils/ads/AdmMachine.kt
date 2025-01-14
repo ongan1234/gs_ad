@@ -284,7 +284,7 @@ class AdmMachine(
         )
     }
 
-    fun preloadNativeAd(id: Int = 0, keyPosition: String, isFullScreen: Boolean) {
+    fun preloadNativeAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean) {
         if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) mNativeAd.preloadAd(
             id,
             keyPosition,
@@ -303,7 +303,7 @@ class AdmMachine(
     }
 
     fun loadNativeAd(
-        id: Int = 0,
+        id: Int = -1,
         keyPosition: String,
         container: ConstraintLayout,
         layoutNativeAdViewId: Int,
@@ -318,7 +318,7 @@ class AdmMachine(
         mNativeAd.destroyView(keyPosition)
     }
 
-    fun loadBannerAd(id: Int = 0, keyPosition: String, container: ConstraintLayout) {
+    fun loadBannerAd(id: Int = -1, keyPosition: String, container: ConstraintLayout) {
         if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) mBannerAd.loadBanner(
             id,
             keyPosition,
