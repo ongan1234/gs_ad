@@ -92,7 +92,7 @@ mAdmManager.initUMP(gatherConsentFinished = {
 ### BannerAd
 Gọi Load Ad:
 ```kotlin
-mAdmManager.loadBannerAd(0, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
+mAdmManager.loadBannerAd(-1, AdKeyPosition.BannerAd_ScMain.name, binding.bannerView)
             .setListener(object : OnAdmListener {
                 override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
                     super.onAdLoaded(typeAds, keyPosition)
