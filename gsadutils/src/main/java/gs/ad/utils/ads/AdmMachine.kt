@@ -91,6 +91,7 @@ class AdmMachine(
     }
 
     fun setActivity(activity: Activity) {
+        if(activity.isDestroyed || activity.isFinishing) return
         currentActivity = activity
     }
 

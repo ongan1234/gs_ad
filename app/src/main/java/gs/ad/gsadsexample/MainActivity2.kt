@@ -51,6 +51,7 @@ class MainActivity2 : AppCompatActivity() {
                     if (keyPosition == AdKeyPosition.InterstitialAd_ScMain2.name){
                         mAdmManager
                             .destroyAdByKeyPosition(TYPE_ADS.NativeAd, AdKeyPosition.NativeAd_ScMain2.name)
+                            .destroyAdByKeyPosition(TYPE_ADS.BannerAd, AdKeyPosition.BannerAd_ScMain2.name)
                             .removeListener()
                         mBillingClientLifecycle?.removeListener(this@MainActivity2)
                         finish()
@@ -71,6 +72,18 @@ class MainActivity2 : AppCompatActivity() {
             .loadNativeAd(-1, AdKeyPosition.NativeAd_ScMain2.name, binding.nativeAdContainerView, R.layout.layout_native_ad_origin,
                 isFullScreen = false
             )
+
+        mAdmManager.loadBannerAd(-1, AdKeyPosition.BannerAd_ScMain2.name, binding.bannerView)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mAdmManager.resumeBannerAdView()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mAdmManager.pauseBannerAdView()
     }
 
     private fun checkSubToUpdateUI() {

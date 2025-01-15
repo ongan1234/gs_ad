@@ -5,6 +5,7 @@ enum class AdKeyPosition {
     AppOpenAd_App_From_Background,
 
     BannerAd_ScMain,
+    BannerAd_ScMain2,
     NativeAd_ScMain,
     NativeAd_ScMain2,
     InterstitialAd_ScMain_CountShowAd,
