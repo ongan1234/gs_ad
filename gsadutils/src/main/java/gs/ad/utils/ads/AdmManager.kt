@@ -2,6 +2,8 @@ package gs.ad.utils.ads
 
 import android.app.Activity
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.gms.ads.MediaAspectRatio
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import gs.ad.utils.utils.PreferencesManager
 
 class AdmManager(private val mAdmMachine: AdmMachine) {
@@ -73,8 +75,12 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         mAdmMachine.showRewardAd(keyPosition)
     }
 
-    fun preloadNativeAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean) {
-        mAdmMachine.preloadNativeAd(id, keyPosition, isFullScreen)
+    fun preloadNativeAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean,
+                        isVideoOption: Boolean = false,
+                        isMutedVideo: Boolean = true,
+                        mediaAspectRatio: Int = MediaAspectRatio.PORTRAIT,
+                        nativeAdOptions: Int = NativeAdOptions.ADCHOICES_TOP_LEFT) {
+        mAdmMachine.preloadNativeAd(id, keyPosition, isFullScreen, isVideoOption, isMutedVideo, mediaAspectRatio, nativeAdOptions)
     }
 
     fun applyNativeAdView(
@@ -90,9 +96,13 @@ class AdmManager(private val mAdmMachine: AdmMachine) {
         keyPosition: String,
         container: ConstraintLayout,
         layoutId: Int,
-        isFullScreen: Boolean
+        isFullScreen: Boolean,
+        isVideoOption: Boolean = false,
+        isMutedVideo: Boolean = true,
+        mediaAspectRatio: Int = MediaAspectRatio.PORTRAIT,
+        nativeAdOptions: Int = NativeAdOptions.ADCHOICES_TOP_LEFT
     ) {
-        mAdmMachine.loadNativeAd(id, keyPosition, container, layoutId, isFullScreen)
+        mAdmMachine.loadNativeAd(id, keyPosition, container, layoutId, isFullScreen, isVideoOption, isMutedVideo, mediaAspectRatio, nativeAdOptions)
     }
 
     fun loadBannerAd(id: Int = -1, keyPosition: String, container: ConstraintLayout) {

@@ -77,11 +77,18 @@ internal class AdmNativeAd(
     }
 
     private val listNativeAdUnitId: List<String> = listNativeAdUnitID
-    private val isMutedVideo: Boolean = true
     private var keyPositionPreloaded: String? = null
     private var countTier: Int = 0
 
-    fun preloadAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean) {
+    fun preloadAd(id: Int = -1,
+                  keyPosition: String,
+                  isFullScreen: Boolean,
+                  isVideoOption: Boolean,
+                  isMutedVideo: Boolean = true,
+                  mediaAspectRatio: Int = MediaAspectRatio.PORTRAIT,
+                  nativeAdOptions: Int = NativeAdOptions.ADCHOICES_TOP_LEFT
+
+    ) {
         if (listNativeAdUnitId.isEmpty() ||
             id >= listNativeAdUnitId.count() ||
             !NetworkUtil.isNetworkAvailable(context) ||
@@ -120,11 +127,18 @@ internal class AdmNativeAd(
             currentModelByKeyPosition(keyPosition)?.nativeAd = nativeAd
         }
 
-        val videoOptions = VideoOptions.Builder().setStartMuted(isMutedVideo).build()
         val adOptions = NativeAdOptions.Builder()
-            .setVideoOptions(videoOptions)
-            .setAdChoicesPlacement(NativeAdOptions.ADCHOICES_TOP_LEFT)
-        if (isFullScreen) adOptions.setMediaAspectRatio(MediaAspectRatio.PORTRAIT)
+            .setAdChoicesPlacement(nativeAdOptions)
+
+        if(isVideoOption){
+            val videoOptions = VideoOptions.Builder().setStartMuted(isMutedVideo).build()
+            adOptions.setVideoOptions(videoOptions)
+        }
+
+        if (isFullScreen) {
+            adOptions.setMediaAspectRatio(mediaAspectRatio)
+        }
+
         val adOptionsBuild = adOptions.build()
         builder.withNativeAdOptions(adOptionsBuild)
         val adLoader = builder.withAdListener(this).build()
@@ -164,7 +178,11 @@ internal class AdmNativeAd(
         keyPosition: String,
         adContainerView: ConstraintLayout,
         layoutNativeAdView: Int,
-        isFullScreen: Boolean
+        isFullScreen: Boolean,
+        isVideoOption: Boolean,
+        isMutedVideo: Boolean = true,
+        mediaAspectRatio: Int = MediaAspectRatio.PORTRAIT,
+        nativeAdOptions: Int = NativeAdOptions.ADCHOICES_TOP_LEFT
     ) {
 //        destroyView(keyPosition)
 
@@ -218,11 +236,18 @@ internal class AdmNativeAd(
             currentModelByKeyPosition(keyPosition)?.nativeAd = nativeAd
         }
 
-        val videoOptions = VideoOptions.Builder().setStartMuted(isMutedVideo).build()
         val adOptions = NativeAdOptions.Builder()
-            .setVideoOptions(videoOptions)
-            .setAdChoicesPlacement(NativeAdOptions.ADCHOICES_TOP_LEFT)
-        if (isFullScreen) adOptions.setMediaAspectRatio(MediaAspectRatio.PORTRAIT)
+            .setAdChoicesPlacement(nativeAdOptions)
+
+        if(isVideoOption){
+            val videoOptions = VideoOptions.Builder().setStartMuted(isMutedVideo).build()
+            adOptions.setVideoOptions(videoOptions)
+        }
+
+        if (isFullScreen) {
+            adOptions.setMediaAspectRatio(mediaAspectRatio)
+        }
+
         val adOptionsBuild = adOptions.build()
         builder.withNativeAdOptions(adOptionsBuild)
         val adLoader = builder.withAdListener(this).build()

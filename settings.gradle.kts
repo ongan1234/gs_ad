@@ -23,5 +23,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "GSAdsExample"
 include(":app")
-//include(":gsadutils")
+include(":gsadutils")
  

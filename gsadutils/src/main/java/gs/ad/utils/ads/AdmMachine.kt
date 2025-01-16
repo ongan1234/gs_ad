@@ -1,20 +1,20 @@
 package gs.ad.utils.ads
 
 import android.app.Activity
-import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Window
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.gms.ads.MediaAspectRatio
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import gs.ad.utils.ads.format.AdmBannerAd
 import gs.ad.utils.ads.format.AdmInterstitialAd
@@ -51,7 +51,6 @@ class AdmMachine(
     private lateinit var mAdmRewardAd: AdmobRewardAd
     private lateinit var mAdmAppOpenAd: AdmOpenAd
 
-    private var mListActivity: MutableList<String> = mutableListOf()
     private var mHandleEvent: HashMap<String, OnAdmListener> = HashMap()
 
     private val keyEvent: String
@@ -78,7 +77,6 @@ class AdmMachine(
 
     fun getCurrentActivity(): Activity {
         val act = currentActivity ?: mainActivity!!
-        Log.d(TAG, "getCurrentActivity: " + act::class.java.simpleName)
         return act
     }
 
@@ -285,11 +283,19 @@ class AdmMachine(
         )
     }
 
-    fun preloadNativeAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean) {
+    fun preloadNativeAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean,
+                        isVideoOption: Boolean = false,
+                        isMutedVideo: Boolean = true,
+                        mediaAspectRatio: Int = MediaAspectRatio.PORTRAIT,
+                        nativeAdOptions: Int = NativeAdOptions.ADCHOICES_TOP_LEFT) {
         if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) mNativeAd.preloadAd(
             id,
             keyPosition,
-            isFullScreen
+            isFullScreen,
+            isVideoOption,
+            isMutedVideo,
+            mediaAspectRatio,
+            nativeAdOptions
         )
         else mNativeAd.destroyView()
     }
@@ -308,10 +314,14 @@ class AdmMachine(
         keyPosition: String,
         container: ConstraintLayout,
         layoutNativeAdViewId: Int,
-        isFullScreen: Boolean
+        isFullScreen: Boolean,
+        isVideoOption: Boolean = false,
+        isMutedVideo: Boolean = true,
+        mediaAspectRatio: Int = MediaAspectRatio.PORTRAIT,
+        nativeAdOptions: Int = NativeAdOptions.ADCHOICES_TOP_LEFT
     ) {
         if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == true && googleMobileAdsConsentManager.canRequestAds) {
-            mNativeAd.loadAd(id, keyPosition, container, layoutNativeAdViewId, isFullScreen)
+            mNativeAd.loadAd(id, keyPosition, container, layoutNativeAdViewId, isFullScreen, isVideoOption, isMutedVideo, mediaAspectRatio, nativeAdOptions)
         } else mNativeAd.destroyView()
     }
 
