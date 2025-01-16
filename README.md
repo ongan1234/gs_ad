@@ -13,7 +13,7 @@ Như hình:
 #### dependencies
 Cài thư viện
 ```gradle
-implementation("com.github.ongan1234:gs_ad:1.0.4")
+implementation("com.github.ongan1234:gs_ad:1.0.5")
 ```
 Thêm các thư viện
 ```gradle
