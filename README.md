@@ -166,6 +166,38 @@ override fun onCreate(savedInstanceState: Bundle?) {
         mAdmManager.setListener(this)
 }
 ```
+các hàm trong OnAdmListener:
+```kotlin
+ mAdmManager.setListener(object: OnAdmListener {
+            override fun onAdLoaded(typeAds: TYPE_ADS, keyPosition: String) {
+                super.onAdLoaded(typeAds, keyPosition)
+            }
+
+            override fun onAdClicked(typeAds: TYPE_ADS, keyPosition: String) {
+                super.onAdClicked(typeAds, keyPosition)
+            }
+
+            override fun onAdClosed(typeAds: TYPE_ADS, keyPosition: String) {
+                super.onAdClosed(typeAds, keyPosition)
+            }
+
+            override fun onAdFailToLoaded(typeAds: TYPE_ADS, keyPosition: String) {
+                super.onAdFailToLoaded(typeAds, keyPosition)
+            }
+
+            override fun onAdHaveReward(typeAds: TYPE_ADS, keyPosition: String) {
+                super.onAdHaveReward(typeAds, keyPosition)
+            }
+
+            override fun onAdNotHaveReward(typeAds: TYPE_ADS, keyPosition: String) {
+                super.onAdNotHaveReward(typeAds, keyPosition)
+            }
+
+            override fun onAdShowed(typeAds: TYPE_ADS, keyPosition: String) {
+                super.onAdShowed(typeAds, keyPosition)
+            }
+        })
+```
 
 Dùng ***removeListener*** trước finish 1 activity như sau:
 ```kotlin
