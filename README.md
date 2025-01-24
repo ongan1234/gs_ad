@@ -13,7 +13,7 @@ Như hình:
 #### dependencies
 Cài thư viện
 ```gradle
-implementation("com.github.ongan1234:gs_ad:1.0.6")
+implementation("com.github.ongan1234:gs_ad:1.0.7")
 ```
 Thêm các thư viện
 ```gradle
@@ -219,6 +219,17 @@ Dùng ***removeListener*** trước finish 1 activity như sau:
     }
 ```
 
+Xem Reward Remove Ad sử dụng như sau, bỏ remove ad thì set ***false*** :
+```kotlin
+PreferencesManager.getInstance().removeAds(true)
+```
+
+```kotlin
+PreferencesManager.getInstance().isRemoveAds()
+```
+
+Sử dụng isRemoveAds() để check remove ad:
+
 # Sub
 ## Cách sử dụng
 Tạo các 4 file Product Id như hình:
@@ -272,6 +283,11 @@ mBillingClientLifecycle.purchaseLifetime(this@SubscriptionActivity, Subscription
 Sử dụng ***fetchSubPurchasedProducts*** để check Sub có tồn tại ko
 ```kotlin
 mBillingClientLifecycle?.fetchSubPurchasedProducts()
+```
+
+Sử dụng isSUB() để check sub:
+```kotlin
+PreferencesManager.getInstance().isSUB()
 ```
 
 ## Tải bản mẫu về xem
