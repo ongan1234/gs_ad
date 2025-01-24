@@ -70,6 +70,12 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
         //reset sub
         //PreferencesManager.getInstance().purchaseFailed()
 
+        //remove lifetime
+        //PreferencesManager.getInstance().removeLifetime()
+
+        //remove Ads
+        //PreferencesManager.getInstance().removeAds(false)
+
         GlobalVariables.canShowOpenAd = false
         binding.splashProcessBar.visibility = View.GONE
         binding.splashProcessBar.progress = 0
@@ -89,18 +95,23 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
                 }
                 override fun onPurchasedProductsFetched(purchaseInfos: List<PurchaseInfo>) {
                     super.onPurchasedProductsFetched(purchaseInfos)
-                    if(isInitUMP) return
-                    isInitUMP = true
-                    mAdmManager.initUMP(gatherConsentFinished = {
-                        loadProgress()
-                    })
+                    initUMP()
                 }
 
                 override fun onBillingError(errorType: ErrorType) {
                     super.onBillingError(errorType)
+                    initUMP()
                 }
             })
         }
+    }
+
+    fun initUMP(){
+        if(isInitUMP) return
+        isInitUMP = true
+        mAdmManager.initUMP(gatherConsentFinished = {
+            loadProgress()
+        })
     }
 
     override fun onStart() {

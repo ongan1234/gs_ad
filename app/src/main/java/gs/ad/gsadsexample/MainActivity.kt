@@ -53,7 +53,14 @@ class MainActivity : AppCompatActivity(), OnAdmListener {
                     Log.d(TAG, "Count Ads onAdClosed : " + mAdmManager.getCounterAds(AdKeyPosition.InterstitialAd_ScMain_CountShowAd.name))
                 }
             }
-            TYPE_ADS.RewardAd -> {}
+            TYPE_ADS.RewardAd -> {
+                if(keyPosition == AdKeyPosition.RewardAd_ScMain_RemoveAd.name){
+                    PreferencesManager.getInstance().removeAds(true)
+                    runOnUiThread{
+                        checkSubToUpdateUI()
+                    }
+                }
+            }
         }
     }
 
@@ -121,7 +128,7 @@ class MainActivity : AppCompatActivity(), OnAdmListener {
         }
 
         binding.button1.setOnClickListener {
-            mAdmManager.showRewardAd(AdKeyPosition.RewardAd_ScMain.name)
+            mAdmManager.showRewardAd(AdKeyPosition.RewardAd_ScMain_RemoveAd.name)
         }
 
         mBillingClientLifecycle?.setListener(this, object : OnBillingListener {
@@ -140,19 +147,32 @@ class MainActivity : AppCompatActivity(), OnAdmListener {
         if (PreferencesManager.getInstance().isSUB()) {
             stopShimmerLoading()
             binding.button2.text = "Have Sub"
-            mAdmManager.destroyAdByKeyPosition(
-                TYPE_ADS.BannerAd,
-                AdKeyPosition.BannerAd_ScMain.name
-            )
-            mAdmManager.destroyAdByKeyPosition(
-                TYPE_ADS.NativeAd,
-                AdKeyPosition.NativeAd_ScMain.name
-            )
-        } else {
+            destroyAd()
+            binding.button1.visibility = INVISIBLE
+
+        }else if(PreferencesManager.getInstance().isRemoveAds()){
+            stopShimmerLoading()
+            binding.button2.text = "Buy Sub"
+            destroyAd()
+            binding.button1.visibility = INVISIBLE
+        }
+        else{
             binding.button2.text = "Buy Sub"
             loadNativeAd()
             loadBannerAd()
+            binding.button1.visibility = VISIBLE
         }
+    }
+
+    private fun destroyAd(){
+        mAdmManager.destroyAdByKeyPosition(
+            TYPE_ADS.BannerAd,
+            AdKeyPosition.BannerAd_ScMain.name
+        )
+        mAdmManager.destroyAdByKeyPosition(
+            TYPE_ADS.NativeAd,
+            AdKeyPosition.NativeAd_ScMain.name
+        )
     }
 
     private fun loadNativeAd() {

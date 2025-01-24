@@ -14,21 +14,25 @@ class PreferencesManager {
         return Prefs[APP_SUB_PRO, false]
     }
 
+    fun removeAds(isRemoveAds : Boolean) {
+        Prefs[APP_REMOVE_ADS] = isRemoveAds
+    }
+
     fun purchaseLifetime() {
         Prefs[APP_IAP_LIFETIME] = true
     }
 
+    fun removeLifetime(){
+        Prefs[APP_IAP_LIFETIME] = false
+    }
+
     fun purchaseAndRestoreSuccess() {
-        Prefs[APP_REMOVE_ADS] = true
         Prefs[APP_SUB_PRO] = true
     }
 
     fun purchaseFailed() {
-        Prefs[APP_IAP_LIFETIME] = false
-        Prefs[APP_REMOVE_ADS] = false
         Prefs[APP_SUB_PRO] = false
     }
-
 
     fun saveShowOnBoard(isSave: Boolean) {
         Prefs[APP_SHOW_ONBOARD] = isSave

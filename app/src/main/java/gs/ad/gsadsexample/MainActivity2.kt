@@ -87,13 +87,13 @@ class MainActivity2 : AppCompatActivity() {
     }
 
     private fun checkSubToUpdateUI() {
-        if (PreferencesManager.getInstance().isSUB()) {
+        if (PreferencesManager.getInstance().isSUB() || PreferencesManager.getInstance().isRemoveAds()) {
             mAdmManager.destroyAdByKeyPosition(
                 TYPE_ADS.NativeAd,
                 AdKeyPosition.NativeAd_ScMain2.name
             )
         } else {
-
+            //TODO
         }
     }
 

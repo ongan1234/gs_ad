@@ -33,14 +33,15 @@ internal class AdmOpenAd(
     private val listOpenAdId: List<String> = listOpenAdUnitID
 
     fun loadAds() {
-        if (!NetworkUtil.isNetworkAvailable(context)) return
-        val act = admMachine.getCurrentActivity() ?: return
-        if (listOpenAdId.isEmpty()) return
-        if (PreferencesManager.getInstance().isSUB()) return
-        if (isAdAvailable()) {
+        if (!NetworkUtil.isNetworkAvailable(context) ||
+            listOpenAdId.isEmpty() ||
+            isAdAvailable() ||
+            PreferencesManager.getInstance().isSUB() ||
+            PreferencesManager.getInstance().isRemoveAds()) {
             admMachine.onAdFailToLoaded(TYPE_ADS.OpenAd, keyPosition)
             return
         }
+        val act = admMachine.getCurrentActivity()
 
         if (isLoadedAds) return
         isLoadedAds = true
@@ -129,7 +130,7 @@ internal class AdmOpenAd(
 
     fun showAds(keyPosition: String) {
         val act = admMachine.getCurrentActivity() ?: return
-        if (PreferencesManager.getInstance().isSUB()) return
+        if (PreferencesManager.getInstance().isSUB() || PreferencesManager.getInstance().isRemoveAds()) return
 
         this.keyPosition = keyPosition
         if (isAdAvailable()) {

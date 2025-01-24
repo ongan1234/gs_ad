@@ -95,12 +95,12 @@ internal class AdmNativeAd(
             admMachine.getCurrentActivity().isFinishing ||
             admMachine.getCurrentActivity().isDestroyed ||
             currentModelByKeyPosition(keyPosition) != null ||
-            currentModelByKeyPosition(keyPosition)?.nativeAd != null) {
+            currentModelByKeyPosition(keyPosition)?.nativeAd != null ||
+            PreferencesManager.getInstance().isSUB() ||
+            PreferencesManager.getInstance().isRemoveAds()) {
             admMachine.onAdFailToLoaded(TYPE_ADS.NativeAd, keyPosition)
             return
         }
-
-        if (PreferencesManager.getInstance().isSUB()) return
 
         val act = admMachine.getCurrentActivity()
         mListAdmModel.add(
@@ -191,12 +191,13 @@ internal class AdmNativeAd(
             !NetworkUtil.isNetworkAvailable(context) ||
             currentModelByKeyPosition(keyPosition) != null ||
             admMachine.getCurrentActivity().isDestroyed ||
-            admMachine.getCurrentActivity().isFinishing
+            admMachine.getCurrentActivity().isFinishing ||
+            PreferencesManager.getInstance().isSUB() ||
+            PreferencesManager.getInstance().isRemoveAds()
             ){
             admMachine.onAdFailToLoaded(TYPE_ADS.NativeAd, keyPosition)
             return
         }
-        if (PreferencesManager.getInstance().isSUB()) return
 
         val act = admMachine.getCurrentActivity()
         adContainerView.visibility = GONE

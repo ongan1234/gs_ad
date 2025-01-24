@@ -83,12 +83,12 @@ internal class AdmBannerAd(
             !NetworkUtil.isNetworkAvailable(context) ||
             currentModelByKeyPosition(keyPosition) != null ||
             admMachine.getCurrentActivity().isFinishing ||
-            admMachine.getCurrentActivity().isDestroyed) {
+            admMachine.getCurrentActivity().isDestroyed ||
+            PreferencesManager.getInstance().isSUB() ||
+            PreferencesManager.getInstance().isRemoveAds()) {
             admMachine.onAdFailToLoaded(TYPE_ADS.BannerAd, keyPosition)
             return
         }
-
-        if (PreferencesManager.getInstance().isSUB()) return
 
         val act = admMachine.getCurrentActivity()
         // Create a new ad view.

@@ -174,7 +174,7 @@ class AdmMachine(
     }
 
     fun countToShowAds(typeAds: TYPE_ADS, keyPosition: String, startAds: Int, loopAds: Int) {
-        if (PreferencesManager.getInstance().isSUB()) {
+        if (PreferencesManager.getInstance().isSUB() || PreferencesManager.getInstance().isRemoveAds()) {
             closeAds(typeAds, keyPosition)
             return
         }
@@ -198,7 +198,7 @@ class AdmMachine(
     }
 
     private fun showPopupLoadAds(typeAds: TYPE_ADS, keyPosition: String) {
-        if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == false || !googleMobileAdsConsentManager.canRequestAds) {
+        if (GlobalVariables.AdsKeyPositionAllow[keyPosition] == false || !googleMobileAdsConsentManager.canRequestAds || PreferencesManager.getInstance().isRemoveAds()) {
             closeAds(typeAds, keyPosition)
             return
         }
@@ -278,9 +278,8 @@ class AdmMachine(
     }
 
     fun showOpenAd(keyPosition: String) {
-        if (googleMobileAdsConsentManager.canRequestAds && GlobalVariables.AdsKeyPositionAllow[keyPosition] == true) mAdmAppOpenAd.showAds(
-            keyPosition
-        )
+        if (googleMobileAdsConsentManager.canRequestAds && GlobalVariables.AdsKeyPositionAllow[keyPosition] == true)
+            mAdmAppOpenAd.showAds(keyPosition)
     }
 
     fun preloadNativeAd(id: Int = -1, keyPosition: String, isFullScreen: Boolean,

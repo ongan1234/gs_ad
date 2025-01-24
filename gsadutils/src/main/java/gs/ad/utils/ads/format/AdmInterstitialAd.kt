@@ -26,15 +26,15 @@ internal class AdmInterstitialAd(
     private var countTier = 0
 
     fun loadAds() {
-        if (!NetworkUtil.isNetworkAvailable(context)) return
-        if (listInterstitialAdUnitId.isEmpty()) return
-        val act= admMachine.getCurrentActivity() ?: return
-        if (PreferencesManager.getInstance().isSUB()) return
-        if (mInterstitialAd != null) {
+        if (!NetworkUtil.isNetworkAvailable(context) ||
+            listInterstitialAdUnitId.isEmpty() ||
+            mInterstitialAd != null ||
+            PreferencesManager.getInstance().isSUB() ||
+            PreferencesManager.getInstance().isRemoveAds()) {
             admMachine.onAdFailToLoaded(TYPE_ADS.InterstitialAd, keyPosition)
             return
         }
-
+        val act= admMachine.getCurrentActivity()
         val adRequest = AdRequest.Builder().build()
 
         InterstitialAd.load(
@@ -109,7 +109,7 @@ internal class AdmInterstitialAd(
 
     fun showAds(key_pos: String) {
         val act = admMachine.getCurrentActivity() ?: return
-        if (PreferencesManager.getInstance().isSUB()) {
+        if (PreferencesManager.getInstance().isSUB() || PreferencesManager.getInstance().isRemoveAds()) {
             closeAds()
             return
         }

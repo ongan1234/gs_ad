@@ -49,13 +49,9 @@ class AdmBuilder(
         if (GlobalVariables.isShowPopup) return
         if (!GlobalVariables.canShowOpenAd) return
 
-        if(!PreferencesManager.getInstance().isSUB()){
-            Log.d(TAG, "show openAd")
-            val keyShowOpenAd = keyShowOpenAd ?: return
-            mAdmManager.showOpenAd(keyShowOpenAd)
-        }else{
-
-        }
+        Log.d(TAG, "show openAd")
+        val keyShowOpenAd = keyShowOpenAd ?: return
+        mAdmManager.showOpenAd(keyShowOpenAd)
     }
 
     override fun onCreate(owner: LifecycleOwner) {

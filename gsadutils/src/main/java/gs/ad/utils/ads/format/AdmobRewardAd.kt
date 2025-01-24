@@ -11,6 +11,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import gs.ad.utils.ads.AdmMachine
 import gs.ad.utils.ads.TYPE_ADS
 import gs.ad.utils.utils.NetworkUtil
+import gs.ad.utils.utils.PreferencesManager
 
 internal class AdmobRewardAd(
     private val context: Context,
@@ -28,12 +29,16 @@ internal class AdmobRewardAd(
     fun loadAds() {
         isReward = false
 
-        if (!NetworkUtil.isNetworkAvailable(context)) return
-        if (listRewardAdUnitId.isEmpty()) return
-        val act = admMachine.getCurrentActivity() ?: return
+        if (!NetworkUtil.isNetworkAvailable(context) ||
+            listRewardAdUnitId.isEmpty() ||
+            mRewardedAd != null ||
+            PreferencesManager.getInstance().isRemoveAds()){
+            admMachine.onAdFailToLoaded(TYPE_ADS.RewardAd, keyPosition)
+            return
+        }
         //if(PreferencesManager.getInstance().isSUB())return;
-        if (mRewardedAd != null) return
 
+        val act = admMachine.getCurrentActivity()
         val adRequest = AdRequest.Builder().build()
 
         RewardedAd.load(
@@ -112,7 +117,7 @@ internal class AdmobRewardAd(
         val act = admMachine.getCurrentActivity() ?: return
         keyPosition = key_pos
         admMachine.showAds()
-        //        if(PreferencesManager.getInstance().isSUB() )return;
+        //        if(PreferencesManager.getInstance().isSUB() || PreferencesManager.getInstance().isRemoveAds() )return;
         if (canShowAds()) {
             mRewardedAd!!.show(
                 act
