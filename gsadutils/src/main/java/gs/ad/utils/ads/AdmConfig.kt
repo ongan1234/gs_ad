@@ -5,5 +5,7 @@ data class AdmConfig(
     var listInterstitialAdUnitID: List<String>,
     var listRewardAdUnitID: List<String>,
     var listNativeAdUnitID: List<String>,
-    var listOpenAdUnitID: List<String>
+    var listOpenAdUnitID: List<String>,
+    var baseURL: String? = null,
+    var endPointKeyPos: String? = null
 )

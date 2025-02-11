@@ -56,6 +56,9 @@ dependencies {
     implementation ("com.github.eriffanani:ContentLoader:1.2.0")
     implementation ("com.android.billingclient:billing:7.1.1")
     implementation ("com.google.guava:guava:32.0.1-jre")
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 }
 
 publishing{

@@ -21,6 +21,9 @@ import gs.ad.utils.ads.format.AdmInterstitialAd
 import gs.ad.utils.ads.format.AdmNativeAd
 import gs.ad.utils.ads.format.AdmOpenAd
 import gs.ad.utils.ads.format.AdmobRewardAd
+import gs.ad.utils.ads.service.AdKeyPositionApiEndpoint
+import gs.ad.utils.ads.service.AdKeyPositionData
+import gs.ad.utils.ads.service.AdKeyPositionService
 import gs.ad.utils.databinding.PopupLoadAdsBinding
 import gs.ad.utils.utils.GlobalVariables
 import gs.ad.utils.utils.NetworkUtil
@@ -29,6 +32,13 @@ import gs.ad.utils.utils.Prefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.atomic.AtomicBoolean
 
 class AdmMachine(
@@ -65,6 +75,7 @@ class AdmMachine(
             return mHandleEvent[keyEvent]
         }
 
+    private var adKeyPositionBaseURL = ""
     private constructor(builder: Builder) : this(builder.context, builder.config) {
         mBannerAd = AdmBannerAd(builder.context, this, builder.config.listBannerAdUnitID)
         mNativeAd = AdmNativeAd(builder.context, this, builder.config.listNativeAdUnitID)
@@ -72,7 +83,42 @@ class AdmMachine(
             AdmInterstitialAd(builder.context, this, builder.config.listInterstitialAdUnitID)
         mAdmRewardAd = AdmobRewardAd(builder.context, this, builder.config.listRewardAdUnitID)
         mAdmAppOpenAd = AdmOpenAd(builder.context, this, builder.config.listOpenAdUnitID)
+
+        AdKeyPositionApiEndpoint.LIST_AD_KEY_POSITION = config.endPointKeyPos ?: ""
+        adKeyPositionBaseURL = config.baseURL ?: ""
+
         Prefs.init(builder.context)
+    }
+
+    fun getAdKeyPosition(onAdKeyPosition:(isSuccess: Boolean, listKeyPosition: List<AdKeyPositionData?>?, errorMessage: String?)-> Unit){
+        val retrofit = Retrofit.Builder()
+            .baseUrl(adKeyPositionBaseURL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(AdKeyPositionService::class.java)
+        val listAdAPI = service.listPosition(AdKeyPositionApiEndpoint.LIST_AD_KEY_POSITION)
+
+        listAdAPI.enqueue(object: Callback<List<AdKeyPositionData>> {
+            override fun onResponse(
+                p0: Call<List<AdKeyPositionData>>,
+                p1: Response<List<AdKeyPositionData>>
+            ) {
+                val response = p1.body()
+                response.let {
+                    it?.forEach { obj ->
+                        obj.let {
+                            GlobalVariables.AdsKeyPositionAllow[it.key_ad] = it.enable
+                        }
+                    }
+                }
+                onAdKeyPosition(true, response, null)
+            }
+
+            override fun onFailure(p0: Call<List<AdKeyPositionData>>, p1: Throwable) {
+                onAdKeyPosition(false, null, p1.localizedMessage)
+            }
+        })
     }
 
     fun getCurrentActivity(): Activity {

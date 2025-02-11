@@ -30,7 +30,9 @@ class AppOwner: MultiDexApplication(){
                 listInterstitialAdUnitID = resources.getStringArray(R.array.interstitial_ad_unit_id).toList(),
                 listRewardAdUnitID = resources.getStringArray(R.array.reward_ad_unit_id).toList(),
                 listNativeAdUnitID = resources.getStringArray(R.array.native_ad_unit_id).toList(),
-                listOpenAdUnitID = resources.getStringArray(R.array.open_ad_unit_id).toList()
+                listOpenAdUnitID = resources.getStringArray(R.array.open_ad_unit_id).toList(),
+                baseURL = "https://pub-d4cd5c4093034bd29293cb74f7cb13f1.r2.dev",
+                endPointKeyPos = "test.json"
             )
             billingClient = mBillingClientLifecycle
         }

@@ -83,9 +83,7 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
         mAdmManager.setListener(this@SplashActivity)
 
         if (mBillingClientLifecycle == null){
-            mAdmManager.initUMP(gatherConsentFinished = {
-                loadProgress()
-            })
+            initUMP()
         }else{
             isInitUMP = false
             mBillingClientLifecycle?.setListener(this, eventListener = object: OnBillingListener {
@@ -110,7 +108,9 @@ class SplashActivity : AppCompatActivity(), OnAdmListener {
         if(isInitUMP) return
         isInitUMP = true
         mAdmManager.initUMP(gatherConsentFinished = {
-            loadProgress()
+            mAdmManager.getAdKeyPosition { isSuccess, listKeyPosition, errorMessage ->
+                loadProgress()
+            }
         })
     }
 

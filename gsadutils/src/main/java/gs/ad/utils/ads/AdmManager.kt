@@ -1,13 +1,17 @@
 package gs.ad.utils.ads
 
-import android.app.Activity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.gms.ads.MediaAspectRatio
 import com.google.android.gms.ads.nativead.NativeAdOptions
+import gs.ad.utils.ads.service.AdKeyPositionData
 import gs.ad.utils.utils.PreferencesManager
 
 class AdmManager(private val mAdmMachine: AdmMachine) {
     private constructor(builder: Builder) : this(builder.admMachine)
+
+    fun getAdKeyPosition(onAdKeyPosition:(isSuccess: Boolean, listKeyPosition: List<AdKeyPositionData?>?, errorMessage: String?)-> Unit){
+        mAdmMachine.getAdKeyPosition(onAdKeyPosition)
+    }
 
     fun resetCounterAds(keyCount: String){
         PreferencesManager.getInstance().resetCounterAds(keyCount)
