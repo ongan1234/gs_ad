@@ -82,12 +82,11 @@ Nếu là Activity main ko finish thì khởi tạo như sau
 private val mAdmManager: AdmManager get() { return (application as AppOwner).mAdmBuilder.isMainActivity(this) }
 ```
 
+Thêm baseURL và endPointKeyPos để lấy dữ liệu từ server
+![plot](./images/config_more.png)
+
 Phải khởi tạo UMP trước khi sử dụng Ad, nên dùng ở trong màn Splash
-```kotlin
-mAdmManager.initUMP(gatherConsentFinished = {
-     //TODO
-})
-```
+![plot](./images/splash.png)
 
 ### BannerAd
 Gọi Load Ad:
